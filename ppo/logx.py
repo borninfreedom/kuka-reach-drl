@@ -79,7 +79,7 @@ class Logger:
     state of a training run, and the trained model.
     """
 
-    def __init__(self, output_dir=None, output_fname='progress.txt', exp_name=None):
+    def __init__(self, output_dir=None, output_fname='progress.txt', exp_name=None,is_debug=True):
         """
         Initialize a Logger.
 
@@ -114,11 +114,12 @@ class Logger:
         self.log_headers = []
         self.log_current_row = {}
         self.exp_name = exp_name
-
+        self.is_debug=is_debug
     def log(self, msg, color='green'):
         """Print a colorized message to stdout."""
-        if proc_id() == 0:
-            print(colorize(msg, color, bold=True))
+        if self.is_debug:
+            if proc_id() == 0:
+                print(colorize(msg, color, bold=True))
 
     def log_tabular(self, key, val):
         """

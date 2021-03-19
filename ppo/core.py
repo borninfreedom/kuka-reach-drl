@@ -1,13 +1,18 @@
 import numpy as np
 import scipy.signal
 from gym.spaces import Box, Discrete
-from ppo.logx import Logger
+from .logx import Logger
 import torch
 import torch.nn as nn
 from torch.distributions.normal import Normal
 from torch.distributions.categorical import Categorical
 
-core_logger=Logger(output_dir="../logs/")
+import sys
+sys.path.append('../')
+
+from train import IS_DEBUG
+
+core_logger=Logger(output_dir="../logs/",is_debug=IS_DEBUG)
 
 def combined_shape(length, shape=None):
     if shape is None:
