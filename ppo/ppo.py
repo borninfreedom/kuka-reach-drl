@@ -8,6 +8,10 @@ from ppo.logx import EpochLogger
 from spinup.utils.mpi_pytorch import setup_pytorch_for_mpi, sync_params, mpi_avg_grads
 from spinup.utils.mpi_tools import mpi_fork, mpi_avg, proc_id, mpi_statistics_scalar, num_procs
 from env.kuka_reach_env import KukaReachEnv
+from ppo.logx import Logger
+
+
+ppo_logger=Logger(output_dir="../logs")
 
 class PPOBuffer:
     """
@@ -26,6 +30,15 @@ class PPOBuffer:
         self.logp_buf = np.zeros(size, dtype=np.float32)
         self.gamma, self.lam = gamma, lam
         self.ptr, self.path_start_idx, self.max_size = 0, 0, size
+        ppo_logger.log("obs_buf={}".format(self.obs_buf),'red')
+        ppo_logger.log("act_buf={}".format(self.act_buf))
+        ppo_logger.log("adv_buf={}".format(self.adv_buf),'blue')
+        ppo_logger.log("rew_buf={}".format(self.rew_buf))
+        ppo_logger.log("ret_buf={}".format(self.ret_buf))
+        ppo_logger.log("val_buf={}".format(self.val_buf),'red')
+        ppo_logger.log("logp_buf={}".format(self.logp_buf))
+
+
 
     def store(self, obs, act, rew, val, logp):
         """
@@ -213,6 +226,7 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
 
     # Create actor-critic module
     ac = actor_critic(env.observation_space, env.action_space, **ac_kwargs)
+    ppo_logger.log("ac={}".format(ac),'green')
 
     # Sync params across processes
     sync_params(ac)
@@ -224,16 +238,21 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
     # Set up experience buffer
     local_steps_per_epoch = int(steps_per_epoch / num_procs())
     buf = PPOBuffer(obs_dim, act_dim, local_steps_per_epoch, gamma, lam)
+    ppo_logger.log("buf={}".format(buf))
 
     # Set up function for computing PPO policy loss
     def compute_loss_pi(data):
         obs, act, adv, logp_old = data['obs'], data['act'], data['adv'], data['logp']
+        ppo_logger.log("obs={}\nact={}\nadv={}\nlogp_old={}".format(obs,act,adv,logp_old))
 
         # Policy loss
         pi, logp = ac.pi(obs, act)
+        ppo_logger.log("pi={},logp={}".format(pi,logp))
+
         ratio = torch.exp(logp - logp_old)
         clip_adv = torch.clamp(ratio, 1 - clip_ratio, 1 + clip_ratio) * adv
         loss_pi = -(torch.min(ratio * adv, clip_adv)).mean()
+        ppo_logger.log("ratio={},clip_adv={},loss_pi={}".format(ratio,clip_adv,loss_pi))
 
         # Useful extra info
         approx_kl = (logp_old - logp).mean().item()
@@ -247,6 +266,7 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
     # Set up function for computing value loss
     def compute_loss_v(data):
         obs, ret = data['obs'], data['ret']
+        ppo_logger.log("obs={},ret={},loss_v={}".format(obs,ret,((ac.v(obs) - ret) ** 2).mean()))
         return ((ac.v(obs) - ret) ** 2).mean()
 
     # Set up optimizers for policy and value function
@@ -260,13 +280,18 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
         data = buf.get()
 
         pi_l_old, pi_info_old = compute_loss_pi(data)
+        ppo_logger.log("pi_l_old={},pi_info_old={}".format(pi_l_old,pi_info_old))
+
         pi_l_old = pi_l_old.item()
         v_l_old = compute_loss_v(data).item()
+        ppo_logger.log("pi_l_old={},v_l_old={}".format(pi_l_old,v_l_old))
 
         # Train policy with multiple steps of gradient descent
         for i in range(train_pi_iters):
             pi_optimizer.zero_grad()
             loss_pi, pi_info = compute_loss_pi(data)
+            ppo_logger.log("loss_pi={},pi_info={}".format(loss_pi,pi_info))
+
             kl = mpi_avg(pi_info['kl'])
             if kl > 1.5 * target_kl:
                 logger.log('Early stopping at step %d due to reaching max kl.' % i)
@@ -281,6 +306,7 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
         for i in range(train_v_iters):
             vf_optimizer.zero_grad()
             loss_v = compute_loss_v(data)
+            ppo_logger.log("loss_v={}".format(loss_v))
             loss_v.backward()
             mpi_avg_grads(ac.v)  # average grads across MPI processes
             vf_optimizer.step()
@@ -295,11 +321,13 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
     # Prepare for interaction with environment
     start_time = time.time()
     o, ep_ret, ep_len = env.reset(), 0, 0
+    ppo_logger.log("o={},ep_ret={},ep_len={}".format(o,ep_ret,ep_len))
 
     # Main loop: collect experience in env and update/log each epoch
     for epoch in range(epochs):
         for t in range(local_steps_per_epoch):
             a, v, logp = ac.step(torch.as_tensor(o, dtype=torch.float32))
+            ppo_logger.log("a={},v={},logp={}".format(a,v,logp))
 
             next_o, r, d, _ = env.step(a)
             ep_ret += r

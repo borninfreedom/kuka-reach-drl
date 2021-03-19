@@ -1,12 +1,13 @@
 import numpy as np
 import scipy.signal
 from gym.spaces import Box, Discrete
-
+from ppo.logx import Logger
 import torch
 import torch.nn as nn
 from torch.distributions.normal import Normal
 from torch.distributions.categorical import Categorical
 
+core_logger=Logger(output_dir="../logs/")
 
 def combined_shape(length, shape=None):
     if shape is None:
@@ -19,6 +20,9 @@ def mlp(sizes, activation, output_activation=nn.Identity):
     for j in range(len(sizes) - 1):
         act = activation if j < len(sizes) - 2 else output_activation
         layers += [nn.Linear(sizes[j], sizes[j + 1]), act()]
+        core_logger.log("layers={}".format(layers),'green')
+        core_logger.log("nn.Sequential={}".format(nn.Sequential(*layers)))
+
     return nn.Sequential(*layers)
 
 
@@ -84,13 +88,18 @@ class MLPGaussianActor(Actor):
         log_std = -0.5 * np.ones(act_dim, dtype=np.float32)
         self.log_std = torch.nn.Parameter(torch.as_tensor(log_std))
         self.mu_net = mlp([obs_dim] + list(hidden_sizes) + [act_dim], activation)
+        core_logger.log("mu_net={}".format(self.mu_net))
 
     def _distribution(self, obs):
         mu = self.mu_net(obs)
         std = torch.exp(self.log_std)
+        core_logger.log("mu={},std={},Normal(mu,std)={}".format(mu,std,Normal(mu,std)))
         return Normal(mu, std)
 
     def _log_prob_from_distribution(self, pi, act):
+        core_logger.log("pi.log_prob(act)={}".format(pi.log_prob(act)),'red')
+        core_logger.log("pi.log_prob(act).sum(axis=-1)={}".format(pi.log_prob(act).sum(axis=-1)))
+
         return pi.log_prob(act).sum(axis=-1)  # Last axis sum needed for Torch Normal distribution
 
 
@@ -99,8 +108,11 @@ class MLPCritic(nn.Module):
     def __init__(self, obs_dim, hidden_sizes, activation):
         super().__init__()
         self.v_net = mlp([obs_dim] + list(hidden_sizes) + [1], activation)
+        core_logger.log("v_net={}".format(self.v_net))
+
 
     def forward(self, obs):
+        core_logger.log("torch.squeeze(self.v_net(obs), -1)".format(torch.squeeze(self.v_net(obs), -1)),'green')
         return torch.squeeze(self.v_net(obs), -1)  # Critical to ensure v has right shape.
 
 
@@ -124,9 +136,14 @@ class MLPActorCritic(nn.Module):
     def step(self, obs):
         with torch.no_grad():
             pi = self.pi._distribution(obs)
+            core_logger.log("pi={}".format(pi))
             a = pi.sample()
+            core_logger.log("a={}".format(a))
             logp_a = self.pi._log_prob_from_distribution(pi, a)
+            core_logger.log("logp_a={}".format(logp_a))
+
             v = self.v(obs)
+            core_logger.log("v={}".format(v),'blue')
         return a.numpy(), v.numpy(), logp_a.numpy()
 
     def act(self, obs):
