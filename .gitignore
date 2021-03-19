@@ -1,3 +1,4 @@
 logs
 .idea
 __pycache__
+.vscode
