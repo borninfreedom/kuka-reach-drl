@@ -1,7 +1,11 @@
 # kuka-reach-drl
 Train kuka robot reach a point with deep rl in pybullet.
 
-![](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train_results.png)
+![The train process](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train.gif)
+
+![The evaluate process](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/eval.gif)
+
+![The average episode reward](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train_results.png)
 
 
 * **I strongly recommend using Conda to install the env, because you will possible encounter the mpi4py error with pip.**
@@ -31,7 +35,7 @@ pip install -e .
 
 ### files guide
 * the train.py file is the main train file, you can directly run it or through `python train.py --cpu 6` to run it in terminal. Please notice the parameters.
-* eval.py file is the evaluate trained model file, the model is in the logs directory named model.pt. In the eval file, pybullet render is open default. **When you run eval.py file, please change the source code `ac=torch.load("logs/ppo-kuka-reach/ppo-kuka-reach_s0/pyt_save/model.pt")` to `ac=torch.load("saved_model/model.pt")`**
+* eval.py file is the evaluate trained model file, the model is in the logs directory named model.pt. In the eval file, pybullet render is open default. **When you want to evaluate my trained model, please change the source code `ac=torch.load("logs/ppo-kuka-reach/ppo-kuka-reach_s0/pyt_save/model.pt")` to `ac=torch.load("saved_model/model.pt")` in `eval.py`**
 * ppo directory is the main algorithms about ppo.
 * env directory is the main pybullet env.
 

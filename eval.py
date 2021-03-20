@@ -9,7 +9,7 @@ import torch
 env=KukaReachEnv(is_good_view=True,is_render=True)
 obs=env.reset()
 
-ac=torch.load("logs/ppo-kuka-reach/ppo-kuka-reach_s0/pyt_save/model.pt")
+ac=torch.load("saved_model/model.pt")
 print('ac={}'.format(ac))
 
 actions=ac.act(torch.as_tensor(obs,dtype=torch.float32))
