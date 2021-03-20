@@ -1,7 +1,7 @@
 # kuka-reach-drl
 Train kuka robot reach a point with deep rl in pybullet.
 
-![](https://github.com/borninfreedom/kuka-reach-drl/pictures/train_results.png)
+![](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train_results.png)
 
 
 * **I strongly recommend using Conda to install the env, because you will possible encounter the mpi4py error with pip.**
