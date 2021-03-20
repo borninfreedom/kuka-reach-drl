@@ -1,10 +1,11 @@
 # kuka-reach-drl
 Train kuka robot reach a point with deep rl in pybullet.
 
+* The train process
 ![The train process](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train.gif)
-
+* The evaluate process
 ![The evaluate process](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/eval.gif)
-
+* The average episode reward
 ![The average episode reward](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train_results.png)
 
 
