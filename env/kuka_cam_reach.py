@@ -26,6 +26,7 @@ import time
 from numpy import arange
 import logging
 import math
+import cv2
 from termcolor import colored
 from colorama import Fore,init
 init(autoreset=True)    # this lets colorama takes effect only in current line.
@@ -203,20 +204,21 @@ class KukaReachEnv(gym.Env):
             shadow=True,
             lightDirection=self.camera_parameters['light_direction'],
             renderer=p.ER_BULLET_HARDWARE_OPENGL
-        )
+        )[2]       # 2 stands for rgbPixels return, it contains [r,g,b,alpha],we dropout alpha.
 
         p.enableJointForceTorqueSensor(
             bodyUniqueId=self.kuka_id,
+
             jointIndex=self.num_joints-1,
             enableSensor=True
         )
 
-        print(Fore.GREEN+'force_sensor={}'.format(self._get_force_sensor_value()))
+        # print(Fore.GREEN+'force_sensor={}'.format(self._get_force_sensor_value()))
 
         self.object_pos=p.getBasePositionAndOrientation(self.object_id)[0]
         #return np.array(self.object_pos).astype(np.float32)
         #return np.array(self.robot_pos_obs).astype(np.float32)
-        return np.array(self.images)
+        return self.images
 
     def step(self,action):
         dv=0.005
@@ -348,12 +350,23 @@ class KukaReachEnv(gym.Env):
 if __name__ == '__main__':
     # 这一部分是做baseline，即让机械臂随机选择动作，看看能够得到的分数
     env=KukaReachEnv(is_good_view=True,is_render=True)
-    print(env)
-    print(env.observation_space.shape)
-    print(env.observation_space.sample())
-    #a=env.reset()
-    force_sensor=env.run_for_debug([0.6,0.0,0.03])
-    print(Fore.RED+'after force sensor={}'.format(force_sensor))
+   # print(env)
+   # print(env.observation_space.shape)
+   # print(env.observation_space.sample())
+    a=env.reset()
+    b=cv2.cvtColor(a,cv2.COLOR_RGBA2RGB)
+    # for i in range(720):
+    #     for j in range(720):
+    #         for k in range(3):
+    #             if not a[i][j][k]==b[i][j][k]:
+    #                 print(Fore.RED+'there is unequal')
+    #                 raise ValueError('there is unequal.')
+
+              
+
+    #print(a)
+    #force_sensor=env.run_for_debug([0.6,0.0,0.03])
+   # print(Fore.RED+'after force sensor={}'.format(force_sensor))
     #print(env.action_space.sample())
 
     # sum_reward=0
