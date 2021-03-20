@@ -63,18 +63,21 @@ class KukaReachEnv(gym.Env):
 
 
         # some camera parameters
+        # all the parameters are tested with test/slide_bar_for_camera.py file.
+
         self.camera_parameters={
             'width':720,
             'height':720,
-            'fov':60,
-            'near':0.02,
+            'fov':48,
+            'near':0.5,
             'far':1,
-            'eye_position':[0.6, 0, 0.6],
-            'target_position':[0.6, 0, 0],
+            'eye_position':[0.59, 0, 0.8],
+            'target_position':[0.55, 0, 0.463],
             'camera_up_vector':[1, 0, 0], # I really do not know the parameter's effect.
             'light_direction':[0.5,0,1],  #the direction is from the light source position to the origin of the world frame.
         }
-   
+
+        
 
         self.view_matrix=p.computeViewMatrix(
             cameraEyePosition=self.camera_parameters['eye_position'],
@@ -111,7 +114,7 @@ class KukaReachEnv(gym.Env):
         self.y_high_action=0.4
         self.z_low_action=-0.6
         self.z_high_action=0.3
-
+        p.configureDebugVisualizer(lightPosition=[5,0,5])
         p.resetDebugVisualizerCamera(cameraDistance=1.5, cameraYaw=0, cameraPitch=-40,
                                      cameraTargetPosition=[0.55, -0.35, 0.2])
 
@@ -353,8 +356,12 @@ if __name__ == '__main__':
    # print(env)
    # print(env.observation_space.shape)
    # print(env.observation_space.sample())
-    a=env.reset()
-    b=cv2.cvtColor(a,cv2.COLOR_RGBA2RGB)
+    for i in range(10):
+        a=env.reset()
+        b=cv2.cvtColor(a,cv2.COLOR_RGBA2RGB)
+        cv2.imshow('img',b)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
     # for i in range(720):
     #     for j in range(720):
     #         for k in range(3):
