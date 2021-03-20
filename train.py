@@ -1,7 +1,7 @@
 from env.kuka_reach_env import KukaReachEnv
-from .ppo.ppo import ppo
+from ppo.ppo import ppo
 from spinup.utils.mpi_tools import mpi_fork
-import .ppo.core as core
+import ppo.core as core
 
 
 
@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser()
 #parser.add_argument('--env', type=str, default=env)
 parser.add_argument('--is_render',type=bool,default=False)
 parser.add_argument('--is_good_view',type=bool,default=False)
-parser.add_argument('--is_debug',type=bool,default=False)
+
 parser.add_argument('--hid', type=int, default=64)
 parser.add_argument('--l', type=int, default=2)
 parser.add_argument('--gamma', type=float, default=0.99)
@@ -26,7 +26,7 @@ parser.add_argument('--exp_name', type=str, default='ppo-kuka-reach')
 parser.add_argument('--log_dir', type=str, default="./logs")
 args = parser.parse_args()
 
-IS_DEBUG=args.is_debug
+
 
 env=KukaReachEnv(is_render=args.is_render,is_good_view=args.is_good_view)
 

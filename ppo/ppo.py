@@ -3,16 +3,15 @@ import torch
 from torch.optim import Adam
 import gym
 import time
-from .core  import core as core
-from .logx import EpochLogger
+import ppo.core as core
+from ppo.logx import EpochLogger
 from spinup.utils.mpi_pytorch import setup_pytorch_for_mpi, sync_params, mpi_avg_grads
 from spinup.utils.mpi_tools import mpi_fork, mpi_avg, proc_id, mpi_statistics_scalar, num_procs
 from env.kuka_reach_env import KukaReachEnv
-from .logx import Logger
+from ppo.logx import Logger
 import sys
-sys.path.append('../')
-from train import IS_DEBUG
 
+IS_DEBUG=False
 ppo_logger=Logger(output_dir="../logs",is_debug=IS_DEBUG)
 
 class PPOBuffer:
