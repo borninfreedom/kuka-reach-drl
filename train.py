@@ -1,3 +1,18 @@
+#!/usr/bin/env python3
+# -*- encoding: utf-8 -*-
+'''
+@File    :   train.py
+@Time    :   2021/03/20 14:30:42
+@Author  :   Yan Wen 
+@Version :   1.0
+@Contact :   z19040042@s.upc.edu.cn
+@License :   (C)Copyright 2021-2022, Liugroup-NLPR-CASIA
+@Desc    :   None
+'''
+
+# here put the import lib
+
+
 from env.kuka_reach_env import KukaReachEnv
 from ppo.ppo import ppo
 from spinup.utils.mpi_tools import mpi_fork

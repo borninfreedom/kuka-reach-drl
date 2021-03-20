@@ -1,3 +1,17 @@
+#!/usr/bin/env python3
+# -*- encoding: utf-8 -*-
+'''
+@File    :   ppo.py
+@Time    :   2021/03/20 14:32:27
+@Author  :   Yan Wen 
+@Version :   1.0
+@Contact :   z19040042@s.upc.edu.cn
+@License :   (C)Copyright 2021-2022, Liugroup-NLPR-CASIA
+@Desc    :   None
+'''
+
+# here put the import lib
+
 import numpy as np
 import torch
 from torch.optim import Adam
