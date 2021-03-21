@@ -25,6 +25,8 @@ import random
 import time
 from numpy import arange
 import logging
+
+
 import math
 import cv2
 import torch.nn.functional as F
@@ -34,6 +36,9 @@ from termcolor import colored
 import torch
 import matplotlib.pyplot as plt
 from colorama import Fore,init
+import sys
+import os
+
 init(autoreset=True)    # this lets colorama takes effect only in current line.
                         # Otherwise, colorama will let the sentences below 'print(Fore.GREEN+'xx')'
                         # all become green color.
@@ -60,7 +65,7 @@ LOGGING_LEVEL=logging.INFO
 # ERROR       由于严重的问题，程序的某些功能已经不能正常执行
 # CRITICAL    严重的错误，表明程序已不能继续执行
 
-class KukaReachEnv(gym.Env):
+class KukaCamReachEnv(gym.Env):
     metadata = {'render.modes':['human','rgb_array'],'video.frames_per_second':50}
     max_steps_one_episode = 1000
 
@@ -127,7 +132,26 @@ class KukaReachEnv(gym.Env):
         p.configureDebugVisualizer(lightPosition=[5,0,5])
         p.resetDebugVisualizerCamera(cameraDistance=1.5, cameraYaw=0, cameraPitch=-40,
                                      cameraTargetPosition=[0.55, -0.35, 0.2])
+        """
+        In [1]: from gym.spaces import Box
+        In [3]: import numpy as np
 
+        In [4]: a=Box(low=-1.0, high=2.0, shape=(3, 4), dtype=np.float32)
+        In [5]: a
+        Out[5]: Box(3, 4)
+        In [6]: a.sample()
+        Out[6]: 
+        array([[1.0952181e+00, 1.3963522e+00, 1.5641378e+00, 1.8437424e+00],
+               [3.5700601e-04, 1.3710285e+00, 1.3180747e+00, 1.0337424e+00],
+               [4.1691920e-01, 3.2490510e-01, 4.4368449e-01, 2.0174764e-01]],
+              dtype=float32)
+
+        In [7]: b=Box(low=np.array([-1.0, -2.0]), high=np.array([2.0, 4.0]), dtype=np.float32)
+        In [8]: b
+        Out[8]: Box(2,)
+        In [9]: b.sample()
+        Out[9]: array([0.31205156, 0.9536385 ], dtype=float32)
+        """
         self.action_space=spaces.Box(low=np.array([self.x_low_action,self.y_low_action,self.z_low_action]),
                                      high=np.array([self.x_high_action,self.y_high_action,self.z_high_action]),
                                      dtype=np.float32)
@@ -377,11 +401,12 @@ class KukaReachEnv(gym.Env):
 
 if __name__ == '__main__':
     # 这一部分是做baseline，即让机械臂随机选择动作，看看能够得到的分数
-    env=KukaReachEnv(is_good_view=True,is_render=True)
+    env=KukaCamReachEnv(is_good_view=True,is_render=True)
     obs=env.reset()
     print(obs)
     print(obs.shape)
-    cnn_policy=core.CNNSharedNet()
+    
+
     #time.sleep(1)
     #env._view_processed_image(obs)
 
