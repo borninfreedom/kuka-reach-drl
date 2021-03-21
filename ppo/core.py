@@ -169,14 +169,14 @@ class MLPActorCritic(nn.Module):
 
 
 class CNNSharedNet(nn.Module):
-    def __init__(self, observation, hidden_sizes):
+    def __init__(self, observation_space, hidden_sizes):
         super(CNNSharedNet, self).__init__()
         pretrained_CNN = 'resnet'+str(hidden_sizes[0])
         self.resnet = torch.hub.load('pytorch/vision:v0.6.0', pretrained_CNN, pretrained=True)
         for param in self.resnet.parameters():
             param.requires_grad = False
 
-        if observation.shape[0] == 1:
+        if observation_space.shape[0] == 1:
             self.resnet.conv1 = nn.Conv2d(1, 64, kernel_size=(7,7), stride=(2,2), padding=(3,3), bias=False)
         self.resnet.fc = nn.Linear(self.resnet.fc.in_features, hidden_sizes[1])
 
@@ -184,11 +184,11 @@ class CNNSharedNet(nn.Module):
         return self.resnet(x)
 
 class CNNActorCritic(nn.Module):
-    def __init__(self, observation, action_space,
-                 hidden_sizes=(18,64,64), activation=nn.Tanh):
+    def __init__(self, observation_space, action_space,
+                 hidden_sizes=[18,64,64], activation=nn.Tanh):
         super().__init__()
         # shared network
-        self.shared = CNNSharedNet(observation, hidden_sizes)
+        self.shared = CNNSharedNet(observation_space, hidden_sizes)
         hidden_sizes.pop(0)
         dummy_obs_dim_to_be_replaced = 1
         # policy builder depends on action space

@@ -129,6 +129,7 @@ class KukaCamReachEnv(gym.Env):
         self.y_high_action=0.4
         self.z_low_action=-0.6
         self.z_high_action=0.3
+
         p.configureDebugVisualizer(lightPosition=[5,0,5])
         p.resetDebugVisualizerCamera(cameraDistance=1.5, cameraYaw=0, cameraPitch=-40,
                                      cameraTargetPosition=[0.55, -0.35, 0.2])
@@ -152,6 +153,7 @@ class KukaCamReachEnv(gym.Env):
         In [9]: b.sample()
         Out[9]: array([0.31205156, 0.9536385 ], dtype=float32)
         """
+
         self.action_space=spaces.Box(low=np.array([self.x_low_action,self.y_low_action,self.z_low_action]),
                                      high=np.array([self.x_high_action,self.y_high_action,self.z_high_action]),
                                      dtype=np.float32)
@@ -159,7 +161,7 @@ class KukaCamReachEnv(gym.Env):
         #                              high=np.array([self.x_high_obs,self.y_high_obs,self.z_high_obs]),
         #                              dtype=np.float32)
 
-        self.observation_space=spaces.Box(low=0,high=1,shape=(1,3,self.final_image_size,
+        self.observation_space=spaces.Box(low=0,high=1,shape=(3,self.final_image_size,
                                                             self.final_image_size),
                                                             dtype=np.float32)
 
@@ -268,7 +270,8 @@ class KukaCamReachEnv(gym.Env):
         image=image.transpose((2,0,1))
         image=np.ascontiguousarray(image,dtype=np.float32)/255.
         image=torch.from_numpy(image)
-        self.processed_image=self.resize(image).unsqueeze(0).to(self.device)
+        #self.processed_image=self.resize(image).unsqueeze(0).to(self.device)
+        self.processed_image=self.resize(image).to(self.device)
         return self.processed_image
 
     # if you want to view the processed image, call this function at somewhere.
@@ -408,10 +411,10 @@ if __name__ == '__main__':
     # 这一部分是做baseline，即让机械臂随机选择动作，看看能够得到的分数
     env=KukaCamReachEnv(is_good_view=True,is_render=True)
     obs=env.reset()
-    print(obs)
-    print(obs.shape)
-    print(env.observation_space)
-    print(env.observation_space.sample())
+    print('obs={}'.format(obs))
+    print('obs.shape={}'.format(obs.shape))
+    print('env.observation_space={}'.format(env.observation_space))
+    print('env.observation_space.sample()={}'.format(env.observation_space.sample()))
     
 
     #time.sleep(1)
