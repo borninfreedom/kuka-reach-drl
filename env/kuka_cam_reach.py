@@ -28,6 +28,7 @@ import logging
 import math
 import cv2
 from termcolor import colored
+import matplotlib.pyplot as plt
 from colorama import Fore,init
 init(autoreset=True)    # this lets colorama takes effect only in current line.
                         # Otherwise, colorama will let the sentences below 'print(Fore.GREEN+'xx')'
@@ -353,22 +354,26 @@ class KukaReachEnv(gym.Env):
 if __name__ == '__main__':
     # 这一部分是做baseline，即让机械臂随机选择动作，看看能够得到的分数
     env=KukaReachEnv(is_good_view=True,is_render=True)
+    a=env.reset()
+    b=a[:,:,:3]
+
    # print(env)
    # print(env.observation_space.shape)
    # print(env.observation_space.sample())
     for i in range(10):
         a=env.reset()
-        b=cv2.cvtColor(a,cv2.COLOR_RGBA2RGB)
-        cv2.imshow('img',b)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-    # for i in range(720):
-    #     for j in range(720):
-    #         for k in range(3):
-    #             if not a[i][j][k]==b[i][j][k]:
-    #                 print(Fore.RED+'there is unequal')
-    #                 raise ValueError('there is unequal.')
+        b=a[:,:,:3]
+        plt.imshow(b)
+        plt.show()
+        time.sleep(1)
 
+    for i in range(720):
+        for j in range(720):
+            for k in range(3):
+                if not a[i][j][k]==b[i][j][k]:
+                    print(Fore.RED+'there is unequal')
+                    raise ValueError('there is unequal.')
+    print('check complete')
               
 
     #print(a)
