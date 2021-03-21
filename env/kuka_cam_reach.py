@@ -68,9 +68,9 @@ LOGGING_LEVEL=logging.INFO
 class KukaCamReachEnv(gym.Env):
     metadata = {'render.modes':['human','rgb_array'],'video.frames_per_second':50}
     max_steps_one_episode = 1000
-
+    final_image_size=40
     resize = T.Compose([T.ToPILImage(),
-                        T.Resize(40, interpolation=Image.CUBIC),
+                        T.Resize(final_image_size, interpolation=Image.CUBIC),
                         T.ToTensor()])
 
     def __init__(self,is_render=False,is_good_view=False):
@@ -155,9 +155,14 @@ class KukaCamReachEnv(gym.Env):
         self.action_space=spaces.Box(low=np.array([self.x_low_action,self.y_low_action,self.z_low_action]),
                                      high=np.array([self.x_high_action,self.y_high_action,self.z_high_action]),
                                      dtype=np.float32)
-        self.observation_space=spaces.Box(low=np.array([self.x_low_obs,self.y_low_obs,self.z_low_obs]),
-                                     high=np.array([self.x_high_obs,self.y_high_obs,self.z_high_obs]),
-                                     dtype=np.float32)
+        # self.observation_space=spaces.Box(low=np.array([self.x_low_obs,self.y_low_obs,self.z_low_obs]),
+        #                              high=np.array([self.x_high_obs,self.y_high_obs,self.z_high_obs]),
+        #                              dtype=np.float32)
+
+        self.observation_space=spaces.Box(low=0,high=1,shape=(1,3,self.final_image_size,
+                                                            self.final_image_size),
+                                                            dtype=np.float32)
+
         self.step_counter=0
 
         self.urdf_root_path = pybullet_data.getDataPath()
@@ -405,6 +410,8 @@ if __name__ == '__main__':
     obs=env.reset()
     print(obs)
     print(obs.shape)
+    print(env.observation_space)
+    print(env.observation_space.sample())
     
 
     #time.sleep(1)
