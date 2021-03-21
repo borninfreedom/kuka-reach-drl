@@ -27,7 +27,11 @@ from numpy import arange
 import logging
 import math
 import cv2
+import torch.nn.functional as F
+import torchvision.transforms as T
+from PIL import Image
 from termcolor import colored
+import torch
 import matplotlib.pyplot as plt
 from colorama import Fore,init
 init(autoreset=True)    # this lets colorama takes effect only in current line.
@@ -60,6 +64,10 @@ class KukaReachEnv(gym.Env):
     metadata = {'render.modes':['human','rgb_array'],'video.frames_per_second':50}
     max_steps_one_episode = 1000
 
+    resize = T.Compose([T.ToPILImage(),
+                        T.Resize(40, interpolation=Image.CUBIC),
+                        T.ToTensor()])
+
     def __init__(self,is_render=False,is_good_view=False):
 
 
@@ -79,6 +87,7 @@ class KukaReachEnv(gym.Env):
         }
 
         
+        self.device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.view_matrix=p.computeViewMatrix(
             cameraEyePosition=self.camera_parameters['eye_position'],
@@ -222,8 +231,23 @@ class KukaReachEnv(gym.Env):
         self.object_pos=p.getBasePositionAndOrientation(self.object_id)[0]
         #return np.array(self.object_pos).astype(np.float32)
         #return np.array(self.robot_pos_obs).astype(np.float32)
-        return self.images
+        self.images=self.images[:,:,:3]  # the 4th channel is alpha channel, we do not need it.
+        return self._process_image(self.images)
+        #return self.images
 
+    def _process_image(self,image):
+        image=image.transpose((2,0,1))
+        image=np.ascontiguousarray(image,dtype=np.float32)/255.
+        image=torch.from_numpy(image)
+        self.processed_image=self.resize(image).unsqueeze(0).to(self.device)
+        return self.processed_image
+
+    # if you want to view the processed image, call this function at somewhere.
+    def _view_processed_image(self,image):
+        plt.imshow(image.cpu().squeeze(0).permute(1, 2, 0).numpy(),
+           interpolation='none')
+        plt.show()
+    
     def step(self,action):
         dv=0.005
         dx=action[0]*dv
@@ -354,26 +378,85 @@ class KukaReachEnv(gym.Env):
 if __name__ == '__main__':
     # 这一部分是做baseline，即让机械臂随机选择动作，看看能够得到的分数
     env=KukaReachEnv(is_good_view=True,is_render=True)
-    a=env.reset()
-    b=a[:,:,:3]
+    obs=env.reset()
+    print(obs)
+    print(obs.shape)
+    cnn_policy=core.CNNSharedNet()
+    #time.sleep(1)
+    #env._view_processed_image(obs)
 
+
+
+
+
+
+
+
+
+
+
+
+    # all the below are some debug codes, if you have interests, look through.
+
+    # b=a[:,:,:3]
+    # c=b.transpose((2,0,1))
+    # #c=b
+    # d=np.ascontiguousarray(c,dtype=np.float32)/255
+    # e=torch.from_numpy(d)
+    # resize=T.Compose([T.ToPILImage(),
+    #                   T.Resize(40,interpolation=Image.CUBIC),
+    #                     T.ToTensor()])
+   
+    # f=resize(e).unsqueeze(0)
+    # #print(f)
+    # # g=f.unsqueeze(0)
+    # # print(g)
+    # #f.transpose((2,0,1))
+
+    # plt.imshow(f.cpu().squeeze(0).permute(1, 2, 0).numpy(),
+    #        interpolation='none')
+
+    # #plt.imshow(f)
+    # plt.show()
+    
+
+    # resize = T.Compose([T.ToPILImage(),
+    #                 T.Resize(40, interpolation=Image.CUBIC),
+    #                 T.ToTensor()])
+
+    
    # print(env)
    # print(env.observation_space.shape)
    # print(env.observation_space.sample())
-    for i in range(10):
-        a=env.reset()
-        b=a[:,:,:3]
-        plt.imshow(b)
-        plt.show()
-        time.sleep(1)
 
-    for i in range(720):
-        for j in range(720):
-            for k in range(3):
-                if not a[i][j][k]==b[i][j][k]:
-                    print(Fore.RED+'there is unequal')
-                    raise ValueError('there is unequal.')
-    print('check complete')
+    # for i in range(10):
+    #     a=env.reset()
+    #     b=a[:,:,:3]
+    #     """
+    #     matplotlib.pyplot.imshow(X, cmap=None, norm=None, aspect=None, interpolation=None, 
+    #     alpha=None, vmin=None, vmax=None, origin=None, extent=None, *, filternorm=True, 
+    #     filterrad=4.0, resample=None, url=None, data=None, **kwargs)
+
+    #     Xarray-like or PIL image
+    #     The image data. Supported array shapes are:
+
+    #     (M, N): an image with scalar data. The values are mapped to colors using normalization and a colormap. See parameters norm, cmap, vmin, vmax.
+    #     (M, N, 3): an image with RGB values (0-1 float or 0-255 int).
+    #     (M, N, 4): an image with RGBA values (0-1 float or 0-255 int), i.e. including transparency.
+    #     The first two dimensions (M, N) define the rows and columns of the image.
+    #     Out-of-range RGB(A) values are clipped.
+    #     """
+    #     plt.imshow(b)
+    #     plt.show()
+    #     time.sleep(1)
+
+    # for i in range(720):
+    #     for j in range(720):
+    #         for k in range(3):
+    #             if not a[i][j][k]==b[i][j][k]:
+    #                 print(Fore.RED+'there is unequal')
+    #                 raise ValueError('there is unequal.')
+    # print('check complete')
               
 
     #print(a)
