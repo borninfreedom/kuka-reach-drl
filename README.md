@@ -58,3 +58,5 @@ but I can not ensure this method can success.
 
 1. [spinningup docs](https://spinningup.openai.com/en/latest/user/installation.html)
 2. [Proximal Policy Optimization Tutorial (Part 1/2: Actor-Critic Method)](https://towardsdatascience.com/proximal-policy-optimization-tutorial-part-1-actor-critic-method-d53f9afffbf6)(do not carefully read now.)
+3. [some ray/rllib and other rl problems' blogs](https://www.datahubbs.com/)
+4. [Action Masking with RLlib](https://towardsdatascience.com/action-masking-with-rllib-5e4bec5e7505)
