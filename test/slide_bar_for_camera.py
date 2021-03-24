@@ -29,7 +29,7 @@ import math
 import cv2
 from termcolor import colored
 from colorama import Fore,init
-
+from utils.SlideBars import SlideBars
 
 p.connect(p.GUI)
 p.setGravity(0,0,-10)
@@ -251,9 +251,18 @@ light_direction_z_id=p.addUserDebugParameter(
     startValue=1
 )   
     
+slide_bars=SlideBars(kuka_id)
+motorIndices=slide_bars.add_slidebars()
 
 while True:
 
+
+    slide_values=slide_bars.get_slidebars_values()
+    p.setJointMotorControlArray(kuka_id,
+                            motorIndices,
+                            p.POSITION_CONTROL,
+                            targetPositions=slide_values,
+                            )
 
 
     width_value=p.readUserDebugParameter(
