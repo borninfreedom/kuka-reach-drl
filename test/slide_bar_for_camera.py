@@ -29,8 +29,13 @@ import math
 import cv2
 from termcolor import colored
 from colorama import Fore,init
+
+import os,inspect
+current_dir=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+os.chdir(current_dir)
 import sys
 sys.path.append('../')
+
 from utils.SlideBars import SlideBars
 
 p.connect(p.GUI)
