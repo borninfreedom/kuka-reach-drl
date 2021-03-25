@@ -218,7 +218,7 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
             the current policy and value function.
 
     """
-
+    print('called ppo.')
     # Special function to avoid certain slowdowns from PyTorch + MPI combo.
     setup_pytorch_for_mpi()
 

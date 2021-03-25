@@ -135,21 +135,21 @@ for i in range(num_joints):
 width_id=p.addUserDebugParameter(
     paramName='width',
     rangeMin=0,
-    rangeMax=1024,
-    startValue=720
+    rangeMax=760,
+    startValue=320
 )
 
 height_id=p.addUserDebugParameter(
     paramName='height',
     rangeMin=0,
-    rangeMax=1024,
-    startValue=720
+    rangeMax=760,
+    startValue=320
 )
 
 fov_id=p.addUserDebugParameter(
     paramName='fov',
     rangeMin=0,
-    rangeMax=60,
+    rangeMax=100,
     startValue=48
 )
 
@@ -176,85 +176,85 @@ far_id=p.addUserDebugParameter(
 
 eye_position_x_id=p.addUserDebugParameter(
     paramName='eye_position_x',
-    rangeMin=0,
-    rangeMax=2,
+    rangeMin=-5,
+    rangeMax=5,
     startValue=0.59
 )
 
 eye_position_y_id=p.addUserDebugParameter(
     paramName='eye_position_y',
-    rangeMin=-2,
-    rangeMax=2,
+    rangeMin=-5,
+    rangeMax=5,
     startValue=0
 )
 
 eye_position_z_id=p.addUserDebugParameter(
     paramName='eye_position_z',
     rangeMin=0,
-    rangeMax=2,
+    rangeMax=5,
     startValue=0.8
 )
 
 target_position_x_id=p.addUserDebugParameter(
     paramName='target_position_x',
-    rangeMin=0,
-    rangeMax=2,
+    rangeMin=-5,
+    rangeMax=5,
     startValue=0.55
 )   
 
 target_position_y_id=p.addUserDebugParameter(
     paramName='target_position_y',
-    rangeMin=-2,
-    rangeMax=2,
+    rangeMin=-5,
+    rangeMax=5,
     startValue=0
 )   
 
 target_position_z_id=p.addUserDebugParameter(
     paramName='target_position_z',
     rangeMin=0,
-    rangeMax=2,
+    rangeMax=5,
     startValue=0.463
 )   
 
 camera_up_vector_x_id=p.addUserDebugParameter(
     paramName='camera_up_vector_x',
-    rangeMin=0,
-    rangeMax=2,
+    rangeMin=-5,
+    rangeMax=5,
     startValue=1
 )   
 
 camera_up_vector_y_id=p.addUserDebugParameter(
     paramName='camera_up_vector_y',
-    rangeMin=0,
-    rangeMax=2,
+    rangeMin=-5,
+    rangeMax=5,
     startValue=0
 )   
 
 camera_up_vector_z_id=p.addUserDebugParameter(
     paramName='camera_up_vector_z',
     rangeMin=0,
-    rangeMax=2,
+    rangeMax=5,
     startValue=1
 )   
 
 light_direction_x_id=p.addUserDebugParameter(
     paramName='light_direction_x',
-    rangeMin=0,
-    rangeMax=2,
+    rangeMin=-5,
+    rangeMax=5,
     startValue=0.6
 )   
 
 light_direction_y_id=p.addUserDebugParameter(
     paramName='light_direction_y',
-    rangeMin=-2,
-    rangeMax=2,
+    rangeMin=-5,
+    rangeMax=5,
     startValue=0
 )   
 
 light_direction_z_id=p.addUserDebugParameter(
     paramName='light_direction_z',
     rangeMin=0,
-    rangeMax=2,
+    rangeMax=5,
     startValue=1
 )   
     

@@ -44,7 +44,7 @@ init(autoreset=True)    # this lets colorama takes effect only in current line.
                         # all become green color.
 
 #### 一些变量 ######
-LOGGING_LEVEL=logging.INFO
+#LOGGING_LEVEL=logging.INFO
 # is_render=False
 # is_good_view=False   #这个的作用是在step时加上time.sleep()，把机械比的动作放慢，看的更清，但是会降低训练速度
 #########################
@@ -370,7 +370,7 @@ class KukaCamReachEnv(gym.Env):
         info={'distance:',self.distance}
         #self.observation=self.robot_state
         self.observation=self.object_state
-        return np.array(self.observation).astype(np.float32),reward,self.terminated,info
+        return self.processed_image, reward, self.terminated, info
 
     def close(self):
         p.disconnect()
@@ -417,16 +417,8 @@ if __name__ == '__main__':
     print('env.observation_space.sample()={}'.format(env.observation_space.sample()))
     
 
-    #time.sleep(1)
-    #env._view_processed_image(obs)
-
-
-
-
-
-
-
-
+    time.sleep(1)
+    env._view_processed_image(obs)
 
 
 
