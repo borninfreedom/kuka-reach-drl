@@ -29,6 +29,8 @@ import math
 import cv2
 from termcolor import colored
 from colorama import Fore,init
+import sys
+sys.path.append('../')
 from utils.SlideBars import SlideBars
 
 p.connect(p.GUI)
