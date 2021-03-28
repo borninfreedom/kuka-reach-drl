@@ -92,7 +92,7 @@ class KukaCamReachEnv(gym.Env):
         }
 
         
-        self.device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device=torch.device("cpu" if torch.cuda.is_available() else "cpu")
 
         self.view_matrix=p.computeViewMatrix(
             cameraEyePosition=self.camera_parameters['eye_position'],

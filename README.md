@@ -64,3 +64,11 @@ but I can not ensure this method can success.
 6. [Chintan Trivedi's homepage](https://medium.com/@chintan.t93), he writes many blogs about AI and games. It's very recommended.
 7. [Proximal Policy Optimization Tutorial (Part 1/2: Actor-Critic Method)](https://twitter.com/ericwen5986/status/1374361315100172289)
 8. [Proximal Policy Optimization Tutorial (Part 2/2: GAE and PPO loss)](https://twitter.com/ericwen5986/status/1374361470859767809)
+9. [Antonin Raffin](https://araffin.github.io/), he is the member of stable baseline3 project.
+10. [robotics-rl-srl](https://github.com/araffin/robotics-rl-srl), S-RL Toolbox: Reinforcement Learning (RL) and State Representation Learning (SRL) for Robotics.
+11. [zenetio/DeepRL-Robotic](https://github.com/zenetio/DeepRL-Robotic), a deep rl project using gazebo.
+12. [robotology-playground/pybullet-robot-envs](https://github.com/robotology-playground/pybullet-robot-envs), a deep rl project using pybullet, it is built by a company, there are a lot can study from their codes. But their envs do not introduce images.
+13. [mahyaret/kuka_rl](https://github.com/mahyaret/kuka_rl), a tutorial tells you how to implement DQN and ppo algorithms to kuka robot grasping.
+14. [AutodeskRoboticsLab/RLRoboticAssembly](https://github.com/AutodeskRoboticsLab/RLRoboticAssembly), a deep rl robot assembly project build by autodesk, it uses rllib and ray.
+15. [MorvanZhou/train-robot-arm-from-scratch](https://github.com/MorvanZhou/train-robot-arm-from-scratch), a deep rl robot project build by Morvan.
+
