@@ -74,3 +74,4 @@ but I can not ensure this method can success.
 16. [BarisYazici/deep-rl-grasping](https://github.com/BarisYazici/deep-rl-grasping), a deep rl robot grasping project built by a student in Technical University of Munich. He also released his degree's paper, we can learn a lot from his paper.
 17. [spinningup using in pybullet envs](https://www.etedal.net/2020/04/pybullet-panda_3.html), this is a blog about how to use spinningup to pybullet envs and use the image as the observation.
 18. [mahyaret/gym-panda](https://github.com/mahyaret/gym-panda), this is a pybullet panda environment for deep rl. In the codes, author makes the image as the observation.
+19. [gaoxiaos/Supermariobros-PPO-pytorch](https://github.com/gaoxiaos/Supermariobros-PPO-pytorch), a tutorial about how to implement deep rl to super mario game, the algorithms are modified from spiningup, and the observation is image. So the code is very suitable for image based deep rl.
