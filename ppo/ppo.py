@@ -17,6 +17,7 @@ import torch
 from torch.optim import Adam
 import gym
 import time
+from core_lstm import userCritic, userActor
 import ppo.core as core
 from ppo.logx import EpochLogger
 from spinup.utils.mpi_pytorch import setup_pytorch_for_mpi, sync_params, mpi_avg_grads

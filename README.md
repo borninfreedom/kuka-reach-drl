@@ -76,3 +76,4 @@ but I can not ensure this method can success.
 18. [mahyaret/gym-panda](https://github.com/mahyaret/gym-panda), this is a pybullet panda environment for deep rl. In the codes, author makes the image as the observation.
 19. [gaoxiaos/Supermariobros-PPO-pytorch](https://github.com/gaoxiaos/Supermariobros-PPO-pytorch), a tutorial about how to implement deep rl to super mario game, the algorithms are modified from spiningup, and the observation is image. So the code is very suitable for image based deep rl.
 20. [MrSyee/pg-is-all-you-need](https://github.com/MrSyee/pg-is-all-you-need)
+21. [Understanding LSTM Networks](https://colah.github.io/posts/2015-08-Understanding-LSTMs/), this is a good blog introducing lstm.
