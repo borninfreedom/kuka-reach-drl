@@ -35,7 +35,7 @@ from PIL import Image
 from termcolor import colored
 import torch
 import matplotlib.pyplot as plt
-from colorama import Fore,init
+from colorama import Fore,init,Back
 import sys
 import os
 
@@ -80,13 +80,13 @@ class KukaCamReachEnv(gym.Env):
         # all the parameters are tested with test/slide_bar_for_camera.py file.
 
         self.camera_parameters={
-            'width':720,
+            'width':960.,
             'height':720,
-            'fov':48,
-            'near':0.5,
-            'far':1,
+            'fov':60,
+            'near':0.1,
+            'far':100.,
             'eye_position':[0.59, 0, 0.8],
-            'target_position':[0.55, 0, 0.463],
+            'target_position':[0.55, 0, 0.05],
             'camera_up_vector':[1, 0, 0], # I really do not know the parameter's effect.
             'light_direction':[0.5,0,1],  #the direction is from the light source position to the origin of the world frame.
         }
@@ -94,11 +94,17 @@ class KukaCamReachEnv(gym.Env):
         
         self.device=torch.device("cpu" if torch.cuda.is_available() else "cpu")
 
-        self.view_matrix=p.computeViewMatrix(
-            cameraEyePosition=self.camera_parameters['eye_position'],
-            cameraTargetPosition=self.camera_parameters['target_position'],
-            cameraUpVector=self.camera_parameters['camera_up_vector']
-        )
+        # self.view_matrix=p.computeViewMatrix(
+        #     cameraEyePosition=self.camera_parameters['eye_position'],
+        #     cameraTargetPosition=self.camera_parameters['target_position'],
+        #     cameraUpVector=self.camera_parameters['camera_up_vector']
+        # )
+        self.view_matrix = p.computeViewMatrixFromYawPitchRoll(cameraTargetPosition=[0.55,0,0.05],
+                                                    distance=.7,
+                                                    yaw=90,
+                                                    pitch=-70,
+                                                    roll=0,
+                                                    upAxisIndex=2)
 
         self.projection_matrix = p.computeProjectionMatrixFOV(
             fov=self.camera_parameters['fov'],
@@ -240,16 +246,22 @@ class KukaCamReachEnv(gym.Env):
         #logging.debug("init_pos={}\n".format(p.getLinkState(self.kuka_id,self.num_joints-1)))
         p.stepSimulation()
 
-        self.images = p.getCameraImage(
-            width=self.camera_parameters['width'],
-            height=self.camera_parameters['height'],
-            viewMatrix=self.view_matrix,
-            projectionMatrix=self.projection_matrix,
-            shadow=True,
-            lightDirection=self.camera_parameters['light_direction'],
-            renderer=p.ER_BULLET_HARDWARE_OPENGL
-        )[2]       # 2 stands for rgbPixels return, it contains [r,g,b,alpha],we dropout alpha.
+        # (_,_,self.images,_,_) = p.getCameraImage(
+        #     width=self.camera_parameters['width'],
+        #     height=self.camera_parameters['height'],
+        #     viewMatrix=self.view_matrix,
+        #     projectionMatrix=self.projection_matrix,
+            
+        #     renderer=p.ER_BULLET_HARDWARE_OPENGL
+        # )
 
+        (_, _, px, _, _) = p.getCameraImage(width=960,
+                                              height=720,
+                                              viewMatrix=self.view_matrix,
+                                              projectionMatrix=self.projection_matrix,
+                                              renderer=p.ER_BULLET_HARDWARE_OPENGL)
+        self.images=px
+        
         p.enableJointForceTorqueSensor(
             bodyUniqueId=self.kuka_id,
 
