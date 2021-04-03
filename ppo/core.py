@@ -31,62 +31,6 @@ def combined_shape(length, shape=None):
         return (length,)
     return (length, shape) if np.isscalar(shape) else (length, *shape)
 
-def net(observation_shape, action_shape, activation=nn.ReLU, output_activation=nn.Identity):
-    model = nn.Sequential(*[
-        nn.Linear(np.prod(observation_shape), 128), activation(),
-        nn.Linear(128, 128), activation(),
-        nn.Linear(128, 128), activation(),
-        nn.Linear(128, np.prod(action_shape))
-    ])
-    return model
-
-class cnn_model(nn.Module):
-    def __init__(self, num_inputs, num_out, activation=nn.ReLU):
-        super(cnn_model, self).__init__()
-        self.conv1 = nn.Conv2d(num_inputs, 32, 3, stride=2, padding=1)
-        self.conv2 = nn.Conv2d(32, 32, 3, stride=2, padding=1)
-        self.conv3 = nn.Conv2d(32, 32, 3, stride=2, padding=1)
-        self.conv4 = nn.Conv2d(32, 32, 3, stride=2, padding=1)
-        self.lstm = nn.LSTMCell(32*6*6, 512)#32*6*6, 256)#512, 256)
-        # self.critic_linear = nn.Linear(512, 1)
-        # self.actor_linear = nn.Linear(512, num_actions)
-        self.fc_out = nn.Linear(512, num_out)
-        self._initialize_weights()
-
-    def _initialize_weights(self):
-        for module in self.modules():
-            if isinstance(module, nn.Conv2d) or isinstance(module, nn.Linear):
-                nn.init.xavier_uniform_(module.weight)
-                # nn.init.kaiming_uniform_(module.weight)
-                nn.init.constant_(module.bias, 0)
-            elif isinstance(module, nn.LSTMCell):
-                nn.init.constant_(module.bias_ih, 0)
-                nn.init.constant_(module.bias_hh, 0)
-
-    def forward(self, x, hidden):
-        #x = x / 255.0  # scale to 0-1
-        #print(x.shape)
-        #x = x.permute(0, 3, 1, 2)  # NHWC => NCHW
-        x = F.relu(self.conv1(x))
-        x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x))
-        x = F.relu(self.conv4(x))
-        x = x.view(x.size(0), -1)
-        x ,hidden = self.lstm(x, hidden)#, (torch.zeros((1, 512)), torch.zeros((1, 512)))
-        out = self.fc_out(x)
-        return out, (x,hidden)
-
-def cnn_net(observation_shape, action_shape, activation=nn.ReLU, output_activation=nn.Identity):
-    model = nn.Sequential(*[
-        nn.Conv2d(observation_shape, 32, 3, stride=2, padding=1),activation(),
-        nn.Conv2d(32, 32, 3, stride=2, padding=1), activation(),
-        nn.Conv2d(32, 32, 3, stride=2, padding=1), activation(),
-        nn.Conv2d(32, 32, 3, stride=2, padding=1), activation(),
-        nn.Linear(32 * 6 * 6, 512), activation(),
-        nn.Linear(512, np.prod(action_shape))
-    ])
-
-    return model
 
 
 def mlp(sizes, activation, output_activation=nn.Identity):
@@ -120,39 +64,6 @@ def discount_cumsum(x, discount):
          x2]
     """
     return scipy.signal.lfilter([1], [1, float(-discount)], x[::-1], axis=0)[::-1]
-
-class userActor(nn.Module):
-    
-    def __init__(self, obs_dim, act_dim, hidden_sizes, activation, pretrain=None):
-        super().__init__()
-        self.logits_net = cnn_model(obs_dim, act_dim, activation=activation)
-        if pretrain != None:
-            print('\n\nLoading pretrained from %s.\n\n' % pretrain)
-        #    prams = torch.load(pretrain)
-         #   import copy
-          #  self.logits_net.load_state_dict(prams.state_dict())#copy.deepcopy(prams))
-        print(self.logits_net)
-
-    def forward(self, obs, act=None, hidden=None):
-        logits, hidden=self.logits_net(obs, hidden)
-        pi = Categorical(logits=logits)
-        logp_a = None
-        if act is not None:
-            logp_a = pi.log_prob(act)
-        return pi, logp_a, hidden
-
-
-class userCritic(nn.Module):
-
-    def __init__(self, obs_dim, hidden_sizes, activation):
-        super().__init__()
-        self.v_net = cnn_model(obs_dim, 1, activation=activation)#cnn_net([obs_dim] + list(hidden_sizes) + [1], activation)
-        print(self.v_net)
-
-    def forward(self, obs, hidden):
-        v, _ = self.v_net(obs, hidden)
-        return torch.squeeze(v, -1) # Critical to ensure v has right shape.
-
 
 class Actor(nn.Module):
 
@@ -251,55 +162,6 @@ class MLPActorCritic(nn.Module):
             v = self.v(obs)
             core_logger.log("v={}".format(v),'blue')
         return a.numpy(), v.numpy(), logp_a.numpy()
-
-    def act(self, obs):
-        return self.step(obs)[0]
-
-
-
-class CNNSharedNet(nn.Module):
-    def __init__(self, observation_space, hidden_sizes):
-        super(CNNSharedNet, self).__init__()
-        pretrained_CNN = 'resnet'+str(hidden_sizes[0])
-        self.resnet = torch.hub.load('pytorch/vision:v0.6.0', pretrained_CNN, pretrained=True)
-        for param in self.resnet.parameters():
-            param.requires_grad = False
-
-        if observation_space.shape[0] == 1:
-            self.resnet.conv1 = nn.Conv2d(1, 64, kernel_size=(7,7), stride=(2,2), padding=(3,3), bias=False)
-        self.resnet.fc = nn.Linear(self.resnet.fc.in_features, hidden_sizes[1])
-
-    def forward(self, x):
-        return self.resnet(x)
-
-class CNNActorCritic(nn.Module):
-    def __init__(self, observation_space, action_space,
-                 hidden_sizes=[18,64,64], activation=nn.Tanh):
-        super().__init__()
-        # shared network
-        self.shared = CNNSharedNet(observation_space, hidden_sizes)
-        hidden_sizes.pop(0)
-        dummy_obs_dim_to_be_replaced = 1
-        # policy builder depends on action space
-        if isinstance(action_space, Box):
-            self.pi = MLPGaussianActor(dummy_obs_dim_to_be_replaced, action_space.shape[0], hidden_sizes, activation)
-            self.pi.mu_net[0] = self.shared
-        elif isinstance(action_space, Discrete):
-            self.pi = MLPCategoricalActor(dummy_obs_dim_to_be_replaced, action_space.n, hidden_sizes, activation)
-            self.pi.logits_net[0] = self.shared
-        # build value function
-        self.v  = MLPCritic(dummy_obs_dim_to_be_replaced, hidden_sizes, activation)
-        self.v.v_net[0] = self.shared
-
-    def step(self, obs):
-        obs = obs
-        with torch.no_grad():
-            pi = self.pi._distribution(obs.unsqueeze(0))
-            a = pi.sample()
-            logp_a = self.pi._log_prob_from_distribution(pi, a)
-            a = a[0]
-            v = self.v(obs.unsqueeze(0))
-        return a.cpu().numpy(), v.cpu().numpy(), logp_a.cpu().numpy()
 
     def act(self, obs):
         return self.step(obs)[0]
