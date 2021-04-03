@@ -139,27 +139,8 @@ class KukaCamReachEnv(gym.Env):
         p.configureDebugVisualizer(lightPosition=[5,0,5])
         p.resetDebugVisualizerCamera(cameraDistance=1.5, cameraYaw=0, cameraPitch=-40,
                                      cameraTargetPosition=[0.55, -0.35, 0.2])
-        """
-        In [1]: from gym.spaces import Box
-        In [3]: import numpy as np
 
-        In [4]: a=Box(low=-1.0, high=2.0, shape=(3, 4), dtype=np.float32)
-        In [5]: a
-        Out[5]: Box(3, 4)
-        In [6]: a.sample()
-        Out[6]: 
-        array([[1.0952181e+00, 1.3963522e+00, 1.5641378e+00, 1.8437424e+00],
-               [3.5700601e-04, 1.3710285e+00, 1.3180747e+00, 1.0337424e+00],
-               [4.1691920e-01, 3.2490510e-01, 4.4368449e-01, 2.0174764e-01]],
-              dtype=float32)
-
-        In [7]: b=Box(low=np.array([-1.0, -2.0]), high=np.array([2.0, 4.0]), dtype=np.float32)
-        In [8]: b
-        Out[8]: Box(2,)
-        In [9]: b.sample()
-        Out[9]: array([0.31205156, 0.9536385 ], dtype=float32)
-        """
-
+    
         self.action_space=spaces.Box(low=np.array([self.x_low_action,self.y_low_action,self.z_low_action]),
                                      high=np.array([self.x_high_action,self.y_high_action,self.z_high_action]),
                                      dtype=np.float32)
@@ -167,9 +148,7 @@ class KukaCamReachEnv(gym.Env):
         #                              high=np.array([self.x_high_obs,self.y_high_obs,self.z_high_obs]),
         #                              dtype=np.float32)
 
-        self.observation_space=spaces.Box(low=0,high=1,shape=(3,self.final_image_size,
-                                                            self.final_image_size),
-                                                            dtype=np.float32)
+        self.observation_space=spaces.Box(low=0,high=1,shape=(1,84,84))
 
         self.step_counter=0
 
@@ -256,12 +235,12 @@ class KukaCamReachEnv(gym.Env):
         # )
 
         (_, _, px, _, _) = p.getCameraImage(width=960,
-                                              height=720,
+                                              height=960,
                                               viewMatrix=self.view_matrix,
                                               projectionMatrix=self.projection_matrix,
                                               renderer=p.ER_BULLET_HARDWARE_OPENGL)
         self.images=px
-        
+
         p.enableJointForceTorqueSensor(
             bodyUniqueId=self.kuka_id,
 
@@ -275,16 +254,31 @@ class KukaCamReachEnv(gym.Env):
         #return np.array(self.object_pos).astype(np.float32)
         #return np.array(self.robot_pos_obs).astype(np.float32)
         self.images=self.images[:,:,:3]  # the 4th channel is alpha channel, we do not need it.
+        #return self._process_image(self.images)
+
         return self._process_image(self.images)
-        #return self.images
 
     def _process_image(self,image):
-        image=image.transpose((2,0,1))
-        image=np.ascontiguousarray(image,dtype=np.float32)/255.
-        image=torch.from_numpy(image)
-        #self.processed_image=self.resize(image).unsqueeze(0).to(self.device)
-        self.processed_image=self.resize(image).to(self.device)
-        return self.processed_image
+        """Convert the RGB pic to gray pic and add a channel 1
+
+        Args:
+            image ([type]): [description]
+        """
+
+        if image is not None:
+            image=cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)
+            image=cv2.resize(image,(84,84))[None,:,:]/255.
+            return image
+        else:
+            return np.zeros((1,84,84))
+
+
+        # image=image.transpose((2,0,1))
+        # image=np.ascontiguousarray(image,dtype=np.float32)/255.
+        # image=torch.from_numpy(image)
+        # #self.processed_image=self.resize(image).unsqueeze(0).to(self.device)
+        # self.processed_image=self.resize(image).to(self.device)
+        # return self.processed_image
 
     # if you want to view the processed image, call this function at somewhere.
     def _view_processed_image(self,image):
@@ -419,18 +413,48 @@ class KukaCamReachEnv(gym.Env):
         # that return value is a dict rather than tuple.
         return force_sensor_value
 
+
+class CustomSkipFrame(gym.Wrapper):
+    """ Make a 4 frame skip, so the observation space will change to (4,84,84) from (1,84,84)
+
+    Args:
+        gym ([type]): [description]
+    """
+
+    def __init__(self,env,skip=4):
+        super(CustomSkipFrame,self).__init__(env)
+        self.observation_space=spaces.Box(low=0,high=1,shape=(skip,84,84))
+        self.skip=skip
+
+    def step(self,action):
+        total_reward=0
+        states=[]
+        state, reward, done, info = self.env.step(action)
+        for i in range(self.skip):
+            if not done:
+                state, reward, done, info = self.env.step(action)
+                total_reward += reward
+                states.append(state)
+            else:
+                states.append(state)
+        states = np.concatenate(states, 0)[None, :, :, :]
+        return states.astype(np.float32), reward, done, info
+
+    def reset(self):
+        state = self.env.reset()
+        states = np.concatenate([state for _ in range(self.skip)], 0)[None, :, :, :]
+        return states.astype(np.float32)
+
+
 if __name__ == '__main__':
     # 这一部分是做baseline，即让机械臂随机选择动作，看看能够得到的分数
-    env=KukaCamReachEnv(is_good_view=True,is_render=True)
-    obs=env.reset()
-    print('obs={}'.format(obs))
-    print('obs.shape={}'.format(obs.shape))
-    print('env.observation_space={}'.format(env.observation_space))
-    print('env.observation_space.sample()={}'.format(env.observation_space.sample()))
-    
+    import matplotlib.pyplot as plt
+    env=KukaCamReachEnv(is_good_view=False,is_render=False)
+    env=CustomSkipFrame(env)
 
-    time.sleep(1)
-    env._view_processed_image(obs)
+    obs=env.reset()
+    print(obs)
+    print(obs.shape)
 
 
 

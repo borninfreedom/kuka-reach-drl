@@ -78,3 +78,7 @@ but I can not ensure this method can success.
 20. [MrSyee/pg-is-all-you-need](https://github.com/MrSyee/pg-is-all-you-need)
 21. [Understanding LSTM Networks](https://colah.github.io/posts/2015-08-Understanding-LSTMs/), this is a good blog introducing lstm.
 22. [ShangtongZhang/reinforcement-learning-an-introduction](https://github.com/ShangtongZhang/reinforcement-learning-an-introduction), this is the python version code of the book reinforcement learning an introduction second edition, the full book and other resources can be found here [Reinforcement Learning: An Introduction](http://incompleteideas.net/book/the-book-2nd.html).
+
+
+# Machine learning knowledges
+* [The Logit and Sigmoid Functions](https://nathanbrixius.wordpress.com/2016/06/04/functions-i-have-known-logit-and-sigmoid/)
