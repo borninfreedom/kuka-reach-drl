@@ -83,20 +83,23 @@ class userActor(nn.Module):
     
     def __init__(self, obs_dim, act_dim, hidden_sizes, activation, pretrain=None):
         super().__init__()
-        self.logits_net = cnn_model(obs_dim, act_dim, activation=activation)
+        log_std = -0.5 * np.ones(act_dim, dtype=np.float32)
+        self.log_std = torch.nn.Parameter(torch.as_tensor(log_std))
+        self.mu_net = cnn_model(obs_dim, act_dim, activation=activation)
         if pretrain != None:
             print('\n\nLoading pretrained from %s.\n\n' % pretrain)
         #    prams = torch.load(pretrain)
          #   import copy
           #  self.logits_net.load_state_dict(prams.state_dict())#copy.deepcopy(prams))
-        print(self.logits_net)
+        print(self.mu_net)
 
     def forward(self, obs, act=None, hidden=None):
-        logits, hidden=self.logits_net(obs, hidden)
-        pi = Categorical(logits=logits)
+        mu, hidden=self.mu_net(obs, hidden)
+        std = torch.exp(self.log_std)
+        pi = Normal(mu,std)
         logp_a = None
         if act is not None:
-            logp_a = pi.log_prob(act)
+            logp_a = pi.log_prob(act).sum(axis=-1)
         return pi, logp_a, hidden
 
 

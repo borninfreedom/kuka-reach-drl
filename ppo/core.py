@@ -147,7 +147,7 @@ class MLPActorCritic(nn.Module):
         elif isinstance(action_space, Discrete):
             self.pi = MLPCategoricalActor(obs_dim, action_space.n, hidden_sizes, activation)
 
-        # build value function
+        # build value functionp
         self.v = MLPCritic(obs_dim, hidden_sizes, activation)
 
     def step(self, obs):

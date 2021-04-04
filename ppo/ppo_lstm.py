@@ -7,13 +7,14 @@ import time
 import scipy.signal
 # import spinup.algos.pytorch.ppo.core as core
 # from core_1 import Actor, Critic
-from core_lstm import userCritic, userActor
-from env import create_train_env
+from ppo.core_lstm import userCritic, userActor
+#from env import create_train_env
 from spinup.utils.logx import EpochLogger
 from spinup.utils.mpi_pytorch import setup_pytorch_for_mpi, sync_params, mpi_avg_grads
 from spinup.utils.mpi_tools import mpi_fork, mpi_avg, proc_id, mpi_statistics_scalar, num_procs
 
-device = torch.device('cuda')
+#device = torch.device('cuda')
+decice=torch.device("cuda" if torch.cuda.is_avaliable() else "cpu")
 
 def combined_shape(length, shape=None):
     if shape is None:
@@ -240,11 +241,11 @@ def ppo(env_fn, actor=nn.Module, critic=nn.Module, ac_kwargs=dict(), seed=0,
     np.random.seed(seed)
 
     # Instantiate environment
-    env = env_fn()
+    env = env_fn
     # obs_dim = env.observation_space.shape
     # act_dim = env.action_space.shape
     obs_dim = env.observation_space.shape
-    act_dim = env.action_space.n
+    act_dim = env.action_space.shape
     # Create actor-critic module
     # ac_pi = actor(np.prod(obs_dim), act_dim, hidden_sizes=[64,64], activation=nn.Tanh)#env.observation_space, env.action_space, nn.ReLU)
     # ac_v = critic(np.prod(obs_dim), hidden_sizes=[64,64], activation=nn.Tanh)#env.observation_space, nn.ReLU)
