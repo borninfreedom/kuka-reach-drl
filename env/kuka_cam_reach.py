@@ -67,11 +67,11 @@ init(autoreset=True)    # this lets colorama takes effect only in current line.
 
 class KukaCamReachEnv(gym.Env):
     metadata = {'render.modes':['human','rgb_array'],'video.frames_per_second':50}
-    max_steps_one_episode = 1000
-    final_image_size=40
-    resize = T.Compose([T.ToPILImage(),
-                        T.Resize(final_image_size, interpolation=Image.CUBIC),
-                        T.ToTensor()])
+    max_steps_one_episode = 3000
+    # final_image_size=40
+    # resize = T.Compose([T.ToPILImage(),
+    #                     T.Resize(final_image_size, interpolation=Image.CUBIC),
+    #                     T.ToTensor()])
 
     def __init__(self,is_render=False,is_good_view=False):
 
@@ -374,6 +374,13 @@ class KukaCamReachEnv(gym.Env):
             self.terminated=False
 
         info={'distance:',self.distance}
+        (_, _, px, _, _) = p.getCameraImage(width=960,
+                                        height=960,
+                                        viewMatrix=self.view_matrix,
+                                        projectionMatrix=self.projection_matrix,
+                                        renderer=p.ER_BULLET_HARDWARE_OPENGL)
+        self.images=px
+        self.processed_image=self._process_image(self.images)
         #self.observation=self.robot_state
         self.observation=self.object_state
         return self.processed_image, reward, self.terminated, info

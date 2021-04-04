@@ -43,7 +43,7 @@ args = parser.parse_args()
 
 
 
-env=KukaReachEnv(is_render=args.is_render,is_good_view=args.is_good_view)
+env=KukaCamReachEnv(is_render=args.is_render,is_good_view=args.is_good_view)
 env=CustomSkipFrame(env)
 
 print('env={}'.format(env))
@@ -53,12 +53,12 @@ from spinup.utils.run_utils import setup_logger_kwargs
 
 logger_kwargs = setup_logger_kwargs(args.exp_name, args.seed,data_dir=args.log_dir)
 
-# ppo(env,
-#     actor=userActor,
-#     critic=userCritic,
-#     ac_kwargs=dict(hidden_sizes=[args.hid] * args.l),
-#     gamma=args.gamma,
-#     seed=args.seed,
-#     steps_per_epoch=env.max_steps_one_episode*args.cpu,
-#     epochs=args.epochs,
-#     logger_kwargs=logger_kwargs)
+ppo(env,
+    actor=userActor,
+    critic=userCritic,
+    ac_kwargs=dict(hidden_sizes=[args.hid] * args.l),
+    gamma=args.gamma,
+    seed=args.seed,
+    steps_per_epoch=env.max_steps_one_episode*args.cpu,
+    epochs=args.epochs,
+    logger_kwargs=logger_kwargs)

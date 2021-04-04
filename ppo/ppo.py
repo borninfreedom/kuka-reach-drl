@@ -24,6 +24,8 @@ from spinup.utils.mpi_tools import mpi_fork, mpi_avg, proc_id, mpi_statistics_sc
 from env.kuka_reach_env import KukaReachEnv
 from ppo.logx import Logger
 import sys
+from colorama import Fore,Back,init
+init(autoreset=True)
 
 IS_DEBUG=False
 ppo_logger=Logger(output_dir="../logs",is_debug=IS_DEBUG)
@@ -344,11 +346,13 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
             a, v, logp = ac.step(torch.as_tensor(o, dtype=torch.float32))
             ppo_logger.log("a={},v={},logp={}".format(a,v,logp))
 
+            print('a={}'.format(a))
             next_o, r, d, _ = env.step(a)
             ep_ret += r
             ep_len += 1
 
             # save and log
+            print(Back.RED+'o={},\na={},\nr={},\nv={},\nlogp={}'.format(o,a,r,v,logp))
             buf.store(o, a, r, v, logp)
             logger.store(VVals=v)
 

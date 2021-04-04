@@ -12,9 +12,10 @@ from ppo.core_lstm import userCritic, userActor
 from spinup.utils.logx import EpochLogger
 from spinup.utils.mpi_pytorch import setup_pytorch_for_mpi, sync_params, mpi_avg_grads
 from spinup.utils.mpi_tools import mpi_fork, mpi_avg, proc_id, mpi_statistics_scalar, num_procs
-
+from colorama import Fore,Back,init
+init(autoreset=True)
 #device = torch.device('cuda')
-decice=torch.device("cuda" if torch.cuda.is_avaliable() else "cpu")
+decice=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def combined_shape(length, shape=None):
     if shape is None:
@@ -55,7 +56,7 @@ class PPOBuffer:
         self.logp_buf = np.zeros(size, dtype=np.float32)
         self.hidden_h_buf = np.zeros(combined_shape(size, hidden_dim), dtype=np.float32)
         self.hidden_c_buf = np.zeros(combined_shape(size, hidden_dim), dtype=np.float32)
-        print(self.hidden_h_buf.shape)
+        #print(self.hidden_h_buf.shape)
         self.gamma, self.lam = gamma, lam
         self.ptr, self.path_start_idx, self.max_size = 0, 0, size
 
@@ -228,7 +229,7 @@ def ppo(env_fn, actor=nn.Module, critic=nn.Module, ac_kwargs=dict(), seed=0,
     """
 
     # Special function to avoid certain slowdowns from PyTorch + MPI combo.
-    print('exected ppo')
+    #print('exected ppo')
     setup_pytorch_for_mpi()
 
     # Set up logger and save configuration
@@ -252,7 +253,7 @@ def ppo(env_fn, actor=nn.Module, critic=nn.Module, ac_kwargs=dict(), seed=0,
     if pretrain != None:
         ac_pi = torch.load(pretrain)
     else:
-        ac_pi = actor(obs_dim[0], act_dim, hidden_sizes=[64, 64], activation=nn.Tanh, pretrain=pretrain)  # env.observation_space, env.action_space, nn.ReLU)
+        ac_pi = actor(obs_dim[0], act_dim[0], hidden_sizes=[64, 64], activation=nn.Tanh, pretrain=pretrain)  # env.observation_space, env.action_space, nn.ReLU)
     ac_v = critic(obs_dim[0], hidden_sizes=[64, 64], activation=nn.Tanh)  # env.observation_space, nn.ReLU)
 
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cup')
@@ -281,6 +282,7 @@ def ppo(env_fn, actor=nn.Module, critic=nn.Module, ac_kwargs=dict(), seed=0,
 
         # Policy loss
         pi, logp ,_ = ac_pi(obs, act, (hidden_h, hidden_c))
+        #print("pi={}".format(pi))
         ratio = torch.exp(logp - logp_old)
         clip_adv = torch.clamp(ratio, 1-clip_ratio, 1+clip_ratio) * adv
         loss_pi = -(torch.min(ratio * adv, clip_adv)).mean()
@@ -356,18 +358,27 @@ def ppo(env_fn, actor=nn.Module, critic=nn.Module, ac_kwargs=dict(), seed=0,
                 pi, _, hidden_ = ac_pi(rr, None, hidden)
                 a = pi.sample()
                 # logp_a = self.pi._log_prob_from_distribution(pi, a)
-                logp = pi.log_prob(a)#.sum(axis=-1)
+                logp = pi.log_prob(a).sum(axis=-1)
                 v = ac_v(torch.as_tensor(o, dtype=torch.float32).to(device), hidden)
 
-            next_o, r, d, _ = env.step(a.cpu().numpy().item())
+            #print('a={}'.format(a))
+            a=a.cpu().detach().numpy()[0]
+            #print('a={}'.format(a))
+            #print("a.cpu().numpy().item()={}".format(a.cpu().numpy().item()))
+            next_o, r, d, _ = env.step(a)
             ep_ret += r
             ep_len += 1
             #hidden = hidden_ 
 
             # save and log
             #print(hidden[0].shape)
-            buf.store(o, a.cpu().numpy(), r, v.cpu().numpy(), logp.cpu().numpy(), hidden[0].cpu().numpy(), hidden[1].cpu().numpy())
-            logger.store(VVals=v.cpu().numpy())
+            #print('o.shape={}'.format(o.shape))
+            o=o[0]
+            v=v.cpu().detach().numpy()[0]
+            logp=logp.cpu().detach().numpy()[0]
+            #print(Back.RED+'o={},\na={},\nr={},\nv={},\nlogp={}'.format(o,a,r,v,logp))
+            buf.store(o, a, r, v, logp, hidden[0].cpu().numpy(), hidden[1].cpu().numpy())
+            logger.store(VVals=v)
             
             # Update obs (critical!)
             o = next_o
@@ -446,7 +457,7 @@ if __name__ == '__main__':
     env_fn = lambda : create_train_env(1,1,'complex')
     # env_fn = SubprocVecEnv([])
     # env_fn = lambda : JoypadSpace(gym_super_mario_bros.make("SuperMarioBros-{}-{}-v0".format(1, 1)), gym_super_mario_bros.actions.COMPLEX_MOVEMENT)
-    print('exec ppo')
+    #print('exec ppo')
     ppo(env_fn, actor=userActor, critic=userCritic,#core.MLPActorCritic, #gym.make(args.env)
         ac_kwargs=dict(hidden_sizes=[args.hid]*args.l), gamma=args.gamma, 
         seed=args.seed, steps_per_epoch=args.steps, epochs=args.epochs,
