@@ -15,7 +15,7 @@ from spinup.utils.mpi_tools import mpi_fork, mpi_avg, proc_id, mpi_statistics_sc
 from colorama import Fore,Back,init
 init(autoreset=True)
 #device = torch.device('cuda')
-decice=torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def combined_shape(length, shape=None):
     if shape is None:
