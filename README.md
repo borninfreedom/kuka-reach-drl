@@ -17,6 +17,7 @@ first, you should install miniconda or anaconda.
 second, install some dev dependencies.
 ```bash
 sudo apt-get update && sudo apt-get install libopenmpi-dev
+sudo apt install libgl1-mesa-glx
 ```
 third, create a conda virtual environment
 ```bash
@@ -29,7 +30,8 @@ conda activate spinningup
 
 last, install spiningup,is contains almost dependencies
 ```bash
-git clone https://github.com/openai/spinningup.git
+# clone my version, I made some changes.
+git clone https://github.com/borninfreedom/spinningup.git
 cd spinningup
 pip install -e .
 ```

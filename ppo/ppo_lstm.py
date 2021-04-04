@@ -256,7 +256,6 @@ def ppo(env_fn, actor=nn.Module, critic=nn.Module, ac_kwargs=dict(), seed=0,
         ac_pi = actor(obs_dim[0], act_dim[0], hidden_sizes=[64, 64], activation=nn.Tanh, pretrain=pretrain)  # env.observation_space, env.action_space, nn.ReLU)
     ac_v = critic(obs_dim[0], hidden_sizes=[64, 64], activation=nn.Tanh)  # env.observation_space, nn.ReLU)
 
-    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cup')
     ac_pi.to(device)
     ac_v.to(device)
     #ac_pi = nn.DataParallel(ac_pi)
