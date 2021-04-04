@@ -23,6 +23,14 @@ third, create a conda virtual environment
 ```bash
 conda create -n spinningup python=3.6   #python 3.6 is recommended
 ```
+( if you don't install conda, please install it firstly.)
+```bash
+git clone https://github.com/borninfreedom/miniconda
+cd miniconda
+bash miniconda.sh
+```
+
+
 ```bash
 #activate the env
 conda activate spinningup
