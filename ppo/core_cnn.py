@@ -75,7 +75,7 @@ class userActor(nn.Module):
         print(self.mu_net)
 
     def forward(self, obs, act=None):
-        mu, hidden=self.mu_net(obs, hidden)
+        mu=self.mu_net(obs)
         std = torch.exp(self.log_std)
         pi = Normal(mu,std)
         logp_a = None
@@ -91,8 +91,8 @@ class userCritic(nn.Module):
         self.v_net = cnn_model(obs_dim, 1, activation=activation)#cnn_net([obs_dim] + list(hidden_sizes) + [1], activation)
         print(self.v_net)
 
-    def forward(self, obs, hidden):
-        v, _ = self.v_net(obs, hidden)
+    def forward(self, obs):
+        v= self.v_net(obs)
         return torch.squeeze(v, -1) # Critical to ensure v has right shape.
 
 

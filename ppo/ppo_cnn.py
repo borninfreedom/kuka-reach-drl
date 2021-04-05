@@ -5,7 +5,7 @@ from torch.optim import Adam
 import gym
 import time
 import scipy.signal
-from ppo.core_lstm import userCritic, userActor
+from ppo.core_cnn import userCritic, userActor
 from spinup.utils.logx import EpochLogger
 from spinup.utils.mpi_pytorch import setup_pytorch_for_mpi, sync_params, mpi_avg_grads
 from spinup.utils.mpi_tools import mpi_fork, mpi_avg, proc_id, mpi_statistics_scalar, num_procs
@@ -54,7 +54,7 @@ class PPOBuffer:
         self.gamma, self.lam = gamma, lam
         self.ptr, self.path_start_idx, self.max_size = 0, 0, size
 
-    def store(self, obs, act, rew, val, logp, hidden_h, hidden_c):
+    def store(self, obs, act, rew, val, logp):
         """
         Append one timestep of agent-environment interaction to the buffer.
         """
@@ -343,7 +343,7 @@ def ppo(env_fn, actor=nn.Module, critic=nn.Module, ac_kwargs=dict(), seed=0,
             # a, v, logp = ac.step(torch.as_tensor(o, dtype=torch.float32))
             with torch.no_grad():
                 rr = torch.from_numpy(o.copy()).float().to(device)#.unsqueeze(0)
-                pi, _, hidden_ = ac_pi(rr, None)
+                pi, _= ac_pi(rr, None)
                 a = pi.sample()
                 # logp_a = self.pi._log_prob_from_distribution(pi, a)
                 logp = pi.log_prob(a).sum(axis=-1)
@@ -365,12 +365,12 @@ def ppo(env_fn, actor=nn.Module, critic=nn.Module, ac_kwargs=dict(), seed=0,
             v=v.cpu().detach().numpy()[0]
             logp=logp.cpu().detach().numpy()[0]
             #print(Back.RED+'o={},\na={},\nr={},\nv={},\nlogp={}'.format(o,a,r,v,logp))
-            buf.store(o, a, r, v, logp, hidden[0].cpu().numpy(), hidden[1].cpu().numpy())
+            buf.store(o, a, r, v, logp)
             logger.store(VVals=v)
             
             # Update obs (critical!)
             o = next_o
-            hidden = hidden_
+    
 
             timeout = ep_len == max_ep_len
             terminal = d #or timeout
@@ -384,11 +384,11 @@ def ppo(env_fn, actor=nn.Module, critic=nn.Module, ac_kwargs=dict(), seed=0,
                     print('epoch_end')
                     # _, v, _ = ac.step(torch.as_tensor(o, dtype=torch.float32))
                     with torch.no_grad():
-                        v =ac_v(torch.from_numpy(o).float().to(device), hidden).cpu().numpy()
+                        v =ac_v(torch.from_numpy(o).float().to(device)).cpu().numpy()
                 else:
                     print('epret :',ep_ret)
                     v = 0
-                    hidden= (torch.zeros((1, 512), dtype=torch.float).to(device), torch.zeros((1, 512), dtype=torch.float).to(device))
+                    #hidden= (torch.zeros((1, 512), dtype=torch.float).to(device), torch.zeros((1, 512), dtype=torch.float).to(device))
                 buf.finish_path(v)
                 if terminal:
                     # only save EpRet / EpLen if trajectory finished
