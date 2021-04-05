@@ -92,3 +92,22 @@ but I can not ensure this method can success.
 
 # Machine learning knowledges
 * [The Logit and Sigmoid Functions](https://nathanbrixius.wordpress.com/2016/06/04/functions-i-have-known-logit-and-sigmoid/)
+
+# Blogs about deep rl written by me
+1. [Ubuntu助手 — 一键自动安装软件，一键进行系统配置](https://www.guyuehome.com/15107)
+2. [深度强化学习专栏 —— 1.研究现状](https://www.guyuehome.com/21403)
+3. [深度强化学习专栏 —— 2.手撕DQN算法实现CartPole控制](https://www.guyuehome.com/22329)
+4. [深度强化学习专栏 —— 3.实现一阶倒立摆](https://www.guyuehome.com/23439)
+5. [深度强化学习专栏 —— 4. 使用ray做分布式计算](https://www.guyuehome.com/?p=26243)
+6. [深度强化学习专栏 —— 5. 使用ray的tune组件优化强化学习算法的超参数](https://www.guyuehome.com/?p=26247)
+
+
+# Blogs about pybullet written by me
+1. [pybullet杂谈 ：使用深度学习拟合相机坐标系与世界坐标系坐标变换关系（一）](https://www.guyuehome.com/24528)
+2. [pybullet杂谈 ：使用深度学习拟合相机坐标系与世界坐标系坐标变换关系（二）](https://www.guyuehome.com/26255)
+3. [pybullet电机控制总结](https://blog.csdn.net/bornfree5511/article/details/108188632)
+4. [Part 1 - 自定义gym环境](https://blog.csdn.net/bornfree5511/article/details/108212687)
+5. [Part 1.1 - 注册自定义Gym环境](https://blog.csdn.net/bornfree5511/article/details/108212963)
+6. [Part 1.2 - 实现一个井字棋游戏的gym环境](https://blog.csdn.net/bornfree5511/article/details/108214740)
+7. [Part 1.3 - 熟悉PyBullet](https://blog.csdn.net/bornfree5511/article/details/108307638)
+8. [Part 1.4 - 为PyBullet创建Gym环境](https://blog.csdn.net/bornfree5511/article/details/108326084)
