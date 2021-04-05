@@ -47,13 +47,7 @@ class PPOBuffer:
         self.logp_buf = np.zeros(size, dtype=np.float32)
         self.gamma, self.lam = gamma, lam
         self.ptr, self.path_start_idx, self.max_size = 0, 0, size
-        ppo_logger.log("obs_buf={}".format(self.obs_buf),'red')
-        ppo_logger.log("act_buf={}".format(self.act_buf))
-        ppo_logger.log("adv_buf={}".format(self.adv_buf),'blue')
-        ppo_logger.log("rew_buf={}".format(self.rew_buf))
-        ppo_logger.log("ret_buf={}".format(self.ret_buf))
-        ppo_logger.log("val_buf={}".format(self.val_buf),'red')
-        ppo_logger.log("logp_buf={}".format(self.logp_buf))
+
 
 
 
