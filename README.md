@@ -9,12 +9,15 @@ Train kuka robot reach a point with deep rl in pybullet.
 ![The average episode reward](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train_results.png)
 
 
-* **I strongly recommend using Conda to install the env, because you will possible encounter the mpi4py error with pip.**
-* The spinningup rl library is the necessary lib.
 
-### Installation guide (Now only support linux and macos)
+
+# Installation guide (Now only support linux and macos)
+**I strongly recommend using Conda to install the env, because you will possible encounter the mpi4py error with pip.**
+
+The spinningup rl library is the necessary lib.
 first, you should install miniconda or anaconda.
 second, install some dev dependencies.
+
 ```bash
 sudo apt-get update && sudo apt-get install libopenmpi-dev
 sudo apt install libgl1-mesa-glx
@@ -23,12 +26,6 @@ third, create a conda virtual environment
 ```bash
 conda create -n spinningup python=3.6   #python 3.6 is recommended
 ```
-( if you don't install conda, please install it firstly.)
-```bash
-git clone https://github.com/borninfreedom/miniconda
-cd miniconda
-bash miniconda.sh
-```
 
 
 ```bash
@@ -36,7 +33,7 @@ bash miniconda.sh
 conda activate spinningup
 ```
 
-last, install spiningup,is contains almost dependencies
+then, install spiningup,is contains almost dependencies
 ```bash
 # clone my version, I made some changes.
 git clone https://github.com/borninfreedom/spinningup.git
@@ -44,19 +41,21 @@ cd spinningup
 pip install -e .
 ```
 
-### files guide
-* the train.py file is the main train file, you can directly run it or through `python train.py --cpu 6` to run it in terminal. Please notice the parameters.
-* eval.py file is the evaluate trained model file, the model is in the logs directory named model.pt. In the eval file, pybullet render is open default. **When you want to evaluate my trained model, please change the source code `ac=torch.load("logs/ppo-kuka-reach/ppo-kuka-reach_s0/pyt_save/model.pt")` to `ac=torch.load("saved_model/model.pt")` in `eval.py`**
-* ppo directory is the main algorithms about ppo.
-* env directory is the main pybullet env.
+last, install torch and torchvision.
 
-### view the train results through plot
+if you have a gpu, please run this
 ```bash
-python -m spinup.run plot ./logs
-``` 
-More detailed information please visit [plotting results](https://spinningup.openai.com/en/latest/user/plotting.html)
+# CUDA 10.1
+conda install pytorch==1.4.0 torchvision==0.5.0 cudatoolkit=10.1 -c pytorch
+```
 
-#### alternative installation method
+if you only have a cpu, please run this,
+```bash
+# CPU Only
+conda install pytorch==1.4.0 torchvision==0.5.0 cpuonly -c pytorch
+```
+
+## Alternative installation method
 Or, you can create the virtual environment directly through
 ```bash
 conda create --name spinningup --file requirements.txt
@@ -64,7 +63,24 @@ conda create --name spinningup --file requirements.txt
 but I can not ensure this method can success.
 
 
-### some relative blogs and articles.
+
+# Files guide
+the train.py file is the main train file, you can directly run it or through `python train.py --cpu 6` to run it in terminal. Please notice the parameters.
+
+eval.py file is the evaluate trained model file, the model is in the logs directory named model.pt. In the eval file, pybullet render is open default. **When you want to evaluate my trained model, please change the source code `ac=torch.load("logs/ppo-kuka-reach/ppo-kuka-reach_s0/pyt_save/model.pt")` to `ac=torch.load("saved_model/model.pt")` in `eval.py`**
+
+ppo directory is the main algorithms about ppo.
+
+env directory is the main pybullet env.
+
+## view the train results through plot
+```bash
+python -m spinup.run plot ./logs
+``` 
+More detailed information please visit [plotting results](https://spinningup.openai.com/en/latest/user/plotting.html)
+
+
+# some relative blogs and articles.
 
 1. [spinningup docs](https://spinningup.openai.com/en/latest/user/installation.html)
 2. [Proximal Policy Optimization Tutorial (Part 1/2: Actor-Critic Method)](https://towardsdatascience.com/proximal-policy-optimization-tutorial-part-1-actor-critic-method-d53f9afffbf6)(do not carefully read now.)
