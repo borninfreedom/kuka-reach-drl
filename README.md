@@ -43,7 +43,7 @@ pip install -e .
 
 last, install torch and torchvision.
 
-if you have a gpu, please run this
+if you have a gpu, please run this (conda will install a correct version of cudatoolkit and cudnn in the virtual env, so don't care which version you have installed in your machine.)
 ```bash
 # CUDA 10.1
 conda install pytorch==1.4.0 torchvision==0.5.0 cudatoolkit=10.1 -c pytorch
@@ -61,6 +61,38 @@ Or, you can create the virtual environment directly through
 conda create --name spinningup --file requirements.txt
 ```
 but I can not ensure this method can success.
+
+
+# Run instruction
+
+if you want to train the kuka with coordition env, whose input to policy is the coordition of the target pos, and the actor critic framework is based on mlp, please run
+```bash
+python train_reach.py --is_render True --is_good_view True --cpu 6 --epochs 100
+```
+if you don't want to view the scene, just train it, run
+```bash
+python train_reach.py --is_render False --is_good_view False --cpu 6 --epochs 100
+```
+
+if you want to train kuka with image input and cnn model,run
+```bash
+python train_cam_reach_with_cnn.py --is_render True --is_good_view True --cpu 6 --epochs 500
+```
+if you don't want to view the scene, just train it, run
+```bash
+python train_cam_reach_with_cnn.py --is_render False --is_good_view False --cpu 6 --epochs 500
+```
+
+
+if you want to train kuka with image input and lstm model,run
+```bash
+python train_cam_reach.py --is_render True --is_good_view True --cpu 6 --epochs 500
+```
+if you don't want to view the scene, just train it, run
+```bash
+python train_cam_reach.py --is_render False --is_good_view False --cpu 6 --epochs 500
+```
+
 
 
 
