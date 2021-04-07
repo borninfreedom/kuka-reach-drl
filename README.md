@@ -71,7 +71,7 @@ python train_reach.py --is_render True --is_good_view True --cpu 6 --epochs 100
 ```
 if you don't want to view the scene, just train it, run
 ```bash
-python train_reach.py --is_render False --is_good_view False --cpu 6 --epochs 100
+python train_reach.py  --cpu 6 --epochs 100
 ```
 
 if you want to train kuka with image input and cnn model,run
@@ -80,7 +80,7 @@ python train_cam_reach_with_cnn.py --is_render True --is_good_view True --cpu 6 
 ```
 if you don't want to view the scene, just train it, run
 ```bash
-python train_cam_reach_with_cnn.py --is_render False --is_good_view False --cpu 6 --epochs 500
+python train_cam_reach_with_cnn.py  --cpu 6 --epochs 500
 ```
 
 
@@ -90,7 +90,7 @@ python train_cam_reach.py --is_render True --is_good_view True --cpu 6 --epochs 
 ```
 if you don't want to view the scene, just train it, run
 ```bash
-python train_cam_reach.py --is_render False --is_good_view False --cpu 6 --epochs 500
+python train_cam_reach.py --cpu 6 --epochs 500
 ```
 
 
