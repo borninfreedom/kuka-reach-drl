@@ -240,6 +240,31 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
     ppo_logger.log("ac={}".format(ac),'green')
 
     print('ac={}'.format(ac))
+
+    """
+    ac=MLPActorCritic(
+  (pi): MLPGaussianActor(
+    (mu_net): Sequential(
+      (0): Linear(in_features=3, out_features=64, bias=True)
+      (1): Tanh()
+      (2): Linear(in_features=64, out_features=64, bias=True)
+      (3): Tanh()
+      (4): Linear(in_features=64, out_features=3, bias=True)
+      (5): Identity()
+    )
+  )
+  (v): MLPCritic(
+    (v_net): Sequential(
+      (0): Linear(in_features=3, out_features=64, bias=True)
+      (1): Tanh()
+      (2): Linear(in_features=64, out_features=64, bias=True)
+      (3): Tanh()
+      (4): Linear(in_features=64, out_features=1, bias=True)
+      (5): Identity()
+    )
+  )
+)
+    """
     # Sync params across processes
     sync_params(ac)
 
@@ -292,17 +317,17 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
         data = buf.get()
 
         pi_l_old, pi_info_old = compute_loss_pi(data)
-        ppo_logger.log("pi_l_old={},pi_info_old={}".format(pi_l_old,pi_info_old))
+        #ppo_logger.log("pi_l_old={},pi_info_old={}".format(pi_l_old,pi_info_old))
 
         pi_l_old = pi_l_old.item()
         v_l_old = compute_loss_v(data).item()
-        ppo_logger.log("pi_l_old={},v_l_old={}".format(pi_l_old,v_l_old))
+        #ppo_logger.log("pi_l_old={},v_l_old={}".format(pi_l_old,v_l_old))
 
         # Train policy with multiple steps of gradient descent
         for i in range(train_pi_iters):
             pi_optimizer.zero_grad()
             loss_pi, pi_info = compute_loss_pi(data)
-            ppo_logger.log("loss_pi={},pi_info={}".format(loss_pi,pi_info))
+            #ppo_logger.log("loss_pi={},pi_info={}".format(loss_pi,pi_info))
 
             kl = mpi_avg(pi_info['kl'])
             if kl > 1.5 * target_kl:
@@ -333,21 +358,21 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
     # Prepare for interaction with environment
     start_time = time.time()
     o, ep_ret, ep_len = env.reset(), 0, 0
-    ppo_logger.log("o={},ep_ret={},ep_len={}".format(o,ep_ret,ep_len))
+   # ppo_logger.log("o={},ep_ret={},ep_len={}".format(o,ep_ret,ep_len))
 
     # Main loop: collect experience in env and update/log each epoch
     for epoch in range(epochs):
         for t in range(local_steps_per_epoch):
             a, v, logp = ac.step(torch.as_tensor(o, dtype=torch.float32))
-            ppo_logger.log("a={},v={},logp={}".format(a,v,logp))
+          #  ppo_logger.log("a={},v={},logp={}".format(a,v,logp))
 
-            print('a={}'.format(a))
+           # print('a={}'.format(a))
             next_o, r, d, _ = env.step(a)
             ep_ret += r
             ep_len += 1
 
             # save and log
-            print(Back.RED+'o={},\na={},\nr={},\nv={},\nlogp={}'.format(o,a,r,v,logp))
+           # print(Back.RED+'o={},\na={},\nr={},\nv={},\nlogp={}'.format(o,a,r,v,logp))
             buf.store(o, a, r, v, logp)
             logger.store(VVals=v)
 

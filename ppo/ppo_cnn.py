@@ -5,7 +5,10 @@ from torch.optim import Adam
 import gym
 import time
 import scipy.signal
-from ppo.core_cnn import userCritic, userActor
+
+from ppo.core_cnn import CNNActorCritic
+import ppo.core_cnn as core
+
 from spinup.utils.logx import EpochLogger
 from spinup.utils.mpi_pytorch import setup_pytorch_for_mpi, sync_params, mpi_avg_grads
 from spinup.utils.mpi_tools import mpi_fork, mpi_avg, proc_id, mpi_statistics_scalar, num_procs
@@ -109,11 +112,11 @@ class PPOBuffer:
         data = dict(obs=self.obs_buf, act=self.act_buf, ret=self.ret_buf,
                     adv=self.adv_buf, logp=self.logp_buf)
         #data.to(device)
-        return {k: torch.as_tensor(v, dtype=torch.float32).to(device) for k,v in data.items()}
+        return {k: torch.as_tensor(v, dtype=torch.float32) for k,v in data.items()}
 
 
 
-def ppo(env_fn, actor=nn.Module, critic=nn.Module, ac_kwargs=dict(), seed=0,
+def ppo(env_fn, actor_critic=core.CNNActorCritic, ac_kwargs=dict(), seed=0,
         steps_per_epoch=4000, epochs=50, gamma=0.99, clip_ratio=0.2, pi_lr=3e-4,
         vf_lr=1e-3, train_pi_iters=80, train_v_iters=80, lam=0.97, max_ep_len=1000,
         target_kl=0.01, logger_kwargs=dict(), save_freq=10, pretrain=None):
@@ -239,37 +242,27 @@ def ppo(env_fn, actor=nn.Module, critic=nn.Module, ac_kwargs=dict(), seed=0,
     obs_dim = env.observation_space.shape
     act_dim = env.action_space.shape
  
-    if pretrain != None:
-        ac_pi = torch.load(pretrain)
-    else:
-        ac_pi = actor(obs_dim[0], act_dim[0], activation=nn.Tanh, pretrain=pretrain)  # env.observation_space, env.action_space, nn.ReLU)
-    ac_v = critic(obs_dim[0], activation=nn.Tanh)  # env.observation_space, nn.ReLU)
+    ac=actor_critic(env.observation_space,env.action_space,**ac_kwargs)
+    print(Back.RED+'ac={}'.format(ac))
 
-    ac_pi.to(device)
-    ac_v.to(device)
-    #ac_pi = nn.DataParallel(ac_pi)
-    #ac_v = nn.DataParallel(ac_v)
-
-    # Sync params across processes
-   # sync_params(ac_pi)
-   # sync_params(ac_v)
+    sync_params(ac)
 
     # Count variables
     def count_vars(module):
         return sum([np.prod(p.shape) for p in module.parameters()])
-    var_counts = tuple(count_vars(module) for module in [ac_pi, ac_v])
+    var_counts = tuple(count_vars(module) for module in [ac.pi,ac.v])
     logger.log('\nNumber of parameters: \t pi: %d, \t v: %d\n'%var_counts)
 
     # Set up experience buffer
     local_steps_per_epoch = int(steps_per_epoch / num_procs())
-    buf = PPOBuffer(obs_dim, env.action_space.shape, local_steps_per_epoch, gamma, lam)
+    buf = PPOBuffer(obs_dim, act_dim, local_steps_per_epoch, gamma, lam)
           # PPOBuffer(obs_dim, env.action_space.shape, local_steps_per_epoch, gamma, lam)
     # Set up function for computing PPO policy loss
     def compute_loss_pi(data):
         obs, act, adv, logp_old = data['obs'], data['act'], data['adv'], data['logp']
 
         # Policy loss
-        pi, logp= ac_pi(obs, act)
+        pi, logp= ac.pi(obs, act)
         #print("pi={}".format(pi))
         ratio = torch.exp(logp - logp_old)
         clip_adv = torch.clamp(ratio, 1-clip_ratio, 1+clip_ratio) * adv
@@ -287,14 +280,14 @@ def ppo(env_fn, actor=nn.Module, critic=nn.Module, ac_kwargs=dict(), seed=0,
     # Set up function for computing value loss
     def compute_loss_v(data):
         obs, ret = data['obs'], data['ret']
-        return ((ac_v(obs) - ret)**2).mean()
+        return ((ac.v(obs) - ret)**2).mean()
 
     # Set up optimizers for policy and value function
-    pi_optimizer = Adam(ac_pi.parameters(), lr=pi_lr)
-    vf_optimizer = Adam(ac_v.parameters(), lr=vf_lr)
+    pi_optimizer = Adam(ac.pi.parameters(), lr=pi_lr)
+    vf_optimizer = Adam(ac.v.parameters(), lr=vf_lr)
 
     # Set up model saving
-    logger.setup_pytorch_saver(ac_pi)
+    logger.setup_pytorch_saver(ac)
 
     def update():
         data = buf.get()
@@ -312,7 +305,7 @@ def ppo(env_fn, actor=nn.Module, critic=nn.Module, ac_kwargs=dict(), seed=0,
                 logger.log('Early stopping at step %d due to reaching max kl.'%i)
                 break
             loss_pi.backward()
-            mpi_avg_grads(ac_pi)    # average grads across MPI processes
+            mpi_avg_grads(ac.pi)    # average grads across MPI processes
             pi_optimizer.step()
 
         logger.store(StopIter=i)
@@ -322,7 +315,7 @@ def ppo(env_fn, actor=nn.Module, critic=nn.Module, ac_kwargs=dict(), seed=0,
             vf_optimizer.zero_grad()
             loss_v = compute_loss_v(data)
             loss_v.backward()
-            mpi_avg_grads(ac_v)    # average grads across MPI processes
+            mpi_avg_grads(ac.v)    # average grads across MPI processes
             vf_optimizer.step()
 
         # Log changes from update
@@ -338,33 +331,16 @@ def ppo(env_fn, actor=nn.Module, critic=nn.Module, ac_kwargs=dict(), seed=0,
 
     # Main loop: collect experience in env and update/log each epoch
     for epoch in range(epochs):
-        hidden = (torch.zeros((1, 512), dtype=torch.float).to(device), torch.zeros((1, 512), dtype=torch.float).to(device))
+       
         for t in range(local_steps_per_epoch):
-            # a, v, logp = ac.step(torch.as_tensor(o, dtype=torch.float32))
-            with torch.no_grad():
-                rr = torch.from_numpy(o.copy()).float().to(device)#.unsqueeze(0)
-                pi, _= ac_pi(rr, None)
-                a = pi.sample()
-                # logp_a = self.pi._log_prob_from_distribution(pi, a)
-                logp = pi.log_prob(a).sum(axis=-1)
-                v = ac_v(torch.as_tensor(o, dtype=torch.float32).to(device))
 
-            #print('a={}'.format(a))
-            a=a.cpu().detach().numpy()[0]
-            #print('a={}'.format(a))
-            #print("a.cpu().numpy().item()={}".format(a.cpu().numpy().item()))
+            a,v,logp=ac.step(torch.as_tensor(o,dtype=torch.float32))
+
+            print(Back.RED+'a={}'.format(a))
             next_o, r, d, _ = env.step(a)
             ep_ret += r
             ep_len += 1
-            #hidden = hidden_ 
 
-            # save and log
-            #print(hidden[0].shape)
-            #print('o.shape={}'.format(o.shape))
-            o=o[0]
-            v=v.cpu().detach().numpy()[0]
-            logp=logp.cpu().detach().numpy()[0]
-            #print(Back.RED+'o={},\na={},\nr={},\nv={},\nlogp={}'.format(o,a,r,v,logp))
             buf.store(o, a, r, v, logp)
             logger.store(VVals=v)
             
@@ -373,22 +349,18 @@ def ppo(env_fn, actor=nn.Module, critic=nn.Module, ac_kwargs=dict(), seed=0,
     
 
             timeout = ep_len == max_ep_len
-            terminal = d #or timeout
+            terminal = d or timeout
             epoch_ended = t==local_steps_per_epoch-1
 
             if terminal or epoch_ended:
-                if epoch_ended and not(terminal):
+                if epoch_ended and not (terminal):
                     print('Warning: trajectory cut off by epoch at %d steps.'%ep_len, flush=True)
-                # if trajectory didn't reach terminal state, bootstrap value target
-                if epoch_ended:
-                    print('epoch_end')
-                    # _, v, _ = ac.step(torch.as_tensor(o, dtype=torch.float32))
-                    with torch.no_grad():
-                        v =ac_v(torch.from_numpy(o).float().to(device)).cpu().numpy()
+
+                if timeout or epoch_ended:
+                    _,v,_=ac.step(torch.as_tensor(o,dtype=torch.float32))
                 else:
-                    print('epret :',ep_ret)
-                    v = 0
-                    #hidden= (torch.zeros((1, 512), dtype=torch.float).to(device), torch.zeros((1, 512), dtype=torch.float).to(device))
+                    v=0
+
                 buf.finish_path(v)
                 if terminal:
                     # only save EpRet / EpLen if trajectory finished
@@ -431,21 +403,18 @@ if __name__ == '__main__':
     parser.add_argument('--cpu', type=int, default=1)
     parser.add_argument('--steps', type=int, default=4000)
     parser.add_argument('--epochs', type=int, default=350)
-    parser.add_argument('--pretrain', type=str, default='/root/lele/spinningup/spinningup/data/ppo_0715/ppo_0715_s0/pyt_save/model.pt')
-    parser.add_argument('--exp_name', type=str, default='ppo_lstm_1106')
+    #parser.add_argument('--pretrain', type=str, default='/root/lele/spinningup/spinningup/data/ppo_0715/ppo_0715_s0/pyt_save/model.pt')
+    parser.add_argument('--exp_name', type=str, default='ppo-cnn-kuka-reach')
+    parser.add_argument('--log_dir', type=str, default="../logs")
     args = parser.parse_args()
 
-    import os
-    #os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
     mpi_fork(args.cpu)  # run parallel code with mpi
 
     from spinup.utils.run_utils import setup_logger_kwargs
-    logger_kwargs = setup_logger_kwargs(args.exp_name, args.seed)
-    # from baselines.common.vec_env.subproc_vec_env import SubprocVecEnv
+    logger_kwargs = setup_logger_kwargs(args.exp_name, args.seed,data_dir=args.log_dir)
+  
     env_fn = lambda : create_train_env(1,1,'complex')
-    # env_fn = SubprocVecEnv([])
-    # env_fn = lambda : JoypadSpace(gym_super_mario_bros.make("SuperMarioBros-{}-{}-v0".format(1, 1)), gym_super_mario_bros.actions.COMPLEX_MOVEMENT)
-    #print('exec ppo')
+
     ppo(env_fn, actor=userActor, critic=userCritic,#core.MLPActorCritic, #gym.make(args.env)
         ac_kwargs=dict(hidden_sizes=[args.hid]*args.l), gamma=args.gamma, 
         seed=args.seed, steps_per_epoch=args.steps, epochs=args.epochs,
