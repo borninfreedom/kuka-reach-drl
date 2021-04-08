@@ -67,7 +67,7 @@ init(autoreset=True)    # this lets colorama takes effect only in current line.
 
 class KukaCamReachEnv(gym.Env):
     metadata = {'render.modes':['human','rgb_array'],'video.frames_per_second':50}
-    max_steps_one_episode = 3000
+    max_steps_one_episode = 2000
     # final_image_size=40
     # resize = T.Compose([T.ToPILImage(),
     #                     T.Resize(final_image_size, interpolation=Image.CUBIC),

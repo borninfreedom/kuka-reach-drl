@@ -24,8 +24,8 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--is_render',type=bool,default=False)
-parser.add_argument('--is_good_view',type=bool,default=False)
+parser.add_argument('--is_render',action="store_true")
+parser.add_argument('--is_good_view',action="store_true")
 
 parser.add_argument('--hid', type=int, default=64)
 parser.add_argument('--l', type=int, default=2)

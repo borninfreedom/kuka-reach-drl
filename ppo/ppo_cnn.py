@@ -243,7 +243,7 @@ def ppo(env_fn, actor_critic=core.CNNActorCritic, ac_kwargs=dict(), seed=0,
     act_dim = env.action_space.shape
  
     ac=actor_critic(env.observation_space,env.action_space,**ac_kwargs)
-    print(Back.RED+'ac={}'.format(ac))
+    #print(Back.RED+'ac={}'.format(ac))
 
     sync_params(ac)
 
@@ -336,7 +336,7 @@ def ppo(env_fn, actor_critic=core.CNNActorCritic, ac_kwargs=dict(), seed=0,
 
             a,v,logp=ac.step(torch.as_tensor(o,dtype=torch.float32))
 
-            print(Back.RED+'a={}'.format(a))
+           # print(Back.RED+'a={}'.format(a))
             next_o, r, d, _ = env.step(a)
             ep_ret += r
             ep_len += 1
@@ -365,6 +365,7 @@ def ppo(env_fn, actor_critic=core.CNNActorCritic, ac_kwargs=dict(), seed=0,
                 if terminal:
                     # only save EpRet / EpLen if trajectory finished
                     logger.store(EpRet=ep_ret, EpLen=ep_len)
+                    print(Fore.GREEN+'ep_ret={}, ep_len={}'.format(ep_ret,ep_len))
                 o, ep_ret, ep_len = env.reset(), 0, 0
 
 
