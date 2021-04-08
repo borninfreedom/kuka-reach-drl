@@ -239,6 +239,7 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
     ac = actor_critic(env.observation_space, env.action_space, **ac_kwargs)
     ppo_logger.log("ac={}".format(ac),'green')
 
+    print('ac={}'.format(ac))
     # Sync params across processes
     sync_params(ac)
 
