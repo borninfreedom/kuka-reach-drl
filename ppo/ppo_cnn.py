@@ -9,7 +9,7 @@ import scipy.signal
 from ppo.core_cnn import CNNActorCritic
 import ppo.core_cnn as core
 
-from spinup.utils.logx import EpochLogger
+from ppo.logx import EpochLogger
 from spinup.utils.mpi_pytorch import setup_pytorch_for_mpi, sync_params, mpi_avg_grads
 from spinup.utils.mpi_tools import mpi_fork, mpi_avg, proc_id, mpi_statistics_scalar, num_procs
 from colorama import Fore,Back,init

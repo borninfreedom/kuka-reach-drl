@@ -40,8 +40,8 @@ import sys
 import os
 
 init(autoreset=True)    # this lets colorama takes effect only in current line.
-                        # Otherwise, colorama will let the sentences below 'print(Fore.GREEN+'xx')'
-                        # all become green color.
+# Otherwise, colorama will let the sentences below 'print(Fore.GREEN+'xx')'
+# all become green color.
 
 #### 一些变量 ######
 #LOGGING_LEVEL=logging.INFO
@@ -91,7 +91,7 @@ class KukaCamReachEnv(gym.Env):
             'light_direction':[0.5,0,1],  #the direction is from the light source position to the origin of the world frame.
         }
 
-        
+
         self.device=torch.device("cpu" if torch.cuda.is_available() else "cpu")
 
         # self.view_matrix=p.computeViewMatrix(
@@ -140,7 +140,7 @@ class KukaCamReachEnv(gym.Env):
         p.resetDebugVisualizerCamera(cameraDistance=1.5, cameraYaw=0, cameraPitch=-40,
                                      cameraTargetPosition=[0.55, -0.35, 0.2])
 
-    
+
         self.action_space=spaces.Box(low=np.array([self.x_low_action,self.y_low_action,self.z_low_action]),
                                      high=np.array([self.x_high_action,self.y_high_action,self.z_high_action]),
                                      dtype=np.float32)
@@ -205,8 +205,9 @@ class KukaCamReachEnv(gym.Env):
 
         p.loadURDF(os.path.join(self.urdf_root_path, "plane.urdf"), basePosition=[0, 0, -0.65])
         self.kuka_id = p.loadURDF(os.path.join(self.urdf_root_path, "kuka_iiwa/model.urdf"), useFixedBase=True)
-        p.loadURDF(os.path.join(self.urdf_root_path, "table/table.urdf"), basePosition=[0.5, 0, -0.65])
-       # p.loadURDF(os.path.join(self.urdf_root_path, "tray/traybox.urdf"),basePosition=[0.55,0,0])
+        table_uid=p.loadURDF(os.path.join(self.urdf_root_path, "table/table.urdf"), basePosition=[0.5, 0, -0.65])
+        p.changeVisualShape(table_uid,-1,rgbaColor=[1, 1, 1, 1])
+        # p.loadURDF(os.path.join(self.urdf_root_path, "tray/traybox.urdf"),basePosition=[0.55,0,0])
         #object_id=p.loadURDF(os.path.join(self.urdf_root_path, "random_urdfs/000/000.urdf"), basePosition=[0.53,0,0.02])
         self.object_id=p.loadURDF(os.path.join(self.urdf_root_path,"random_urdfs/000/000.urdf"),
                    basePosition=[random.uniform(self.x_low_obs,self.x_high_obs),
@@ -230,7 +231,7 @@ class KukaCamReachEnv(gym.Env):
         #     height=self.camera_parameters['height'],
         #     viewMatrix=self.view_matrix,
         #     projectionMatrix=self.projection_matrix,
-            
+
         #     renderer=p.ER_BULLET_HARDWARE_OPENGL
         # )
 
@@ -285,7 +286,7 @@ class KukaCamReachEnv(gym.Env):
         plt.imshow(image.cpu().squeeze(0).permute(1, 2, 0).numpy(),
            interpolation='none')
         plt.show()
-    
+
     def step(self,action):
         dv=0.005
         dx=action[0]*dv
@@ -293,7 +294,7 @@ class KukaCamReachEnv(gym.Env):
         dz=action[2]*dv
 
         self.current_pos=p.getLinkState(self.kuka_id,self.num_joints-1)[4]
-       # logging.debug("self.current_pos={}\n".format(self.current_pos))
+        # logging.debug("self.current_pos={}\n".format(self.current_pos))
         self.new_robot_pos=[self.current_pos[0]+dx,
                             self.current_pos[1]+dy,
                             self.current_pos[2]+dz]
@@ -319,7 +320,7 @@ class KukaCamReachEnv(gym.Env):
             time.sleep(0.05)
 
         self.step_counter+=1
-        
+
 
         return self._reward()
 
@@ -413,10 +414,10 @@ class KukaCamReachEnv(gym.Env):
         force_sensor_value=p.getJointState(
             bodyUniqueId=self.kuka_id,
             jointIndex=self.num_joints-1
-        )[2][2]     
-        # the first 2 stands for jointReactionForces, the second 2 stands for Fz, 
-        # the pybullet methods' return is a tuple,so can not 
-        # index it with str like dict. I think it can be improved 
+        )[2][2]
+        # the first 2 stands for jointReactionForces, the second 2 stands for Fz,
+        # the pybullet methods' return is a tuple,so can not
+        # index it with str like dict. I think it can be improved
         # that return value is a dict rather than tuple.
         return force_sensor_value
 
@@ -456,13 +457,16 @@ class CustomSkipFrame(gym.Wrapper):
 if __name__ == '__main__':
     # 这一部分是做baseline，即让机械臂随机选择动作，看看能够得到的分数
     import matplotlib.pyplot as plt
-    env=KukaCamReachEnv(is_good_view=False,is_render=False)
+    env=KukaCamReachEnv(is_good_view=True,is_render=False)
     env=CustomSkipFrame(env)
 
     obs=env.reset()
     print(obs)
     print(obs.shape)
 
+    img=obs[0][0]
+    plt.imshow(img,cmap='gray')
+    plt.show()
 
 
 
@@ -476,7 +480,7 @@ if __name__ == '__main__':
     # resize=T.Compose([T.ToPILImage(),
     #                   T.Resize(40,interpolation=Image.CUBIC),
     #                     T.ToTensor()])
-   
+
     # f=resize(e).unsqueeze(0)
     # #print(f)
     # # g=f.unsqueeze(0)
@@ -488,65 +492,65 @@ if __name__ == '__main__':
 
     # #plt.imshow(f)
     # plt.show()
-    
+
 
     # resize = T.Compose([T.ToPILImage(),
     #                 T.Resize(40, interpolation=Image.CUBIC),
     #                 T.ToTensor()])
 
-    
-   # print(env)
-   # print(env.observation_space.shape)
-   # print(env.observation_space.sample())
 
-    # for i in range(10):
-    #     a=env.reset()
-    #     b=a[:,:,:3]
-    #     """
-    #     matplotlib.pyplot.imshow(X, cmap=None, norm=None, aspect=None, interpolation=None, 
-    #     alpha=None, vmin=None, vmax=None, origin=None, extent=None, *, filternorm=True, 
-    #     filterrad=4.0, resample=None, url=None, data=None, **kwargs)
+# print(env)
+# print(env.observation_space.shape)
+# print(env.observation_space.sample())
 
-    #     Xarray-like or PIL image
-    #     The image data. Supported array shapes are:
+# for i in range(10):
+#     a=env.reset()
+#     b=a[:,:,:3]
+#     """
+#     matplotlib.pyplot.imshow(X, cmap=None, norm=None, aspect=None, interpolation=None,
+#     alpha=None, vmin=None, vmax=None, origin=None, extent=None, *, filternorm=True,
+#     filterrad=4.0, resample=None, url=None, data=None, **kwargs)
 
-    #     (M, N): an image with scalar data. The values are mapped to colors using normalization and a colormap. See parameters norm, cmap, vmin, vmax.
-    #     (M, N, 3): an image with RGB values (0-1 float or 0-255 int).
-    #     (M, N, 4): an image with RGBA values (0-1 float or 0-255 int), i.e. including transparency.
-    #     The first two dimensions (M, N) define the rows and columns of the image.
-    #     Out-of-range RGB(A) values are clipped.
-    #     """
-    #     plt.imshow(b)
-    #     plt.show()
-    #     time.sleep(1)
+#     Xarray-like or PIL image
+#     The image data. Supported array shapes are:
 
-    # for i in range(720):
-    #     for j in range(720):
-    #         for k in range(3):
-    #             if not a[i][j][k]==b[i][j][k]:
-    #                 print(Fore.RED+'there is unequal')
-    #                 raise ValueError('there is unequal.')
-    # print('check complete')
-              
+#     (M, N): an image with scalar data. The values are mapped to colors using normalization and a colormap. See parameters norm, cmap, vmin, vmax.
+#     (M, N, 3): an image with RGB values (0-1 float or 0-255 int).
+#     (M, N, 4): an image with RGBA values (0-1 float or 0-255 int), i.e. including transparency.
+#     The first two dimensions (M, N) define the rows and columns of the image.
+#     Out-of-range RGB(A) values are clipped.
+#     """
+#     plt.imshow(b)
+#     plt.show()
+#     time.sleep(1)
 
-    #print(a)
-    #force_sensor=env.run_for_debug([0.6,0.0,0.03])
-   # print(Fore.RED+'after force sensor={}'.format(force_sensor))
-    #print(env.action_space.sample())
+# for i in range(720):
+#     for j in range(720):
+#         for k in range(3):
+#             if not a[i][j][k]==b[i][j][k]:
+#                 print(Fore.RED+'there is unequal')
+#                 raise ValueError('there is unequal.')
+# print('check complete')
 
-    # sum_reward=0
-    # for i in range(10):
-    #     env.reset()
-    #     for i in range(2000):
-    #         action=env.action_space.sample()
-    #         #action=np.array([0,0,0.47-i/1000])
-    #         obs,reward,done,info=env.step(action)
-    #       #  print("i={},\naction={},\nobs={},\ndone={},\n".format(i,action,obs,done,))
-    #         print(colored("reward={},info={}".format(reward,info),"cyan"))
-    #        # print(colored("info={}".format(info),"cyan"))
-    #         sum_reward+=reward
-    #         if done:
-    #             break
-    #        # time.sleep(0.1)
-    # print()
-    # print(sum_reward)
+
+#print(a)
+#force_sensor=env.run_for_debug([0.6,0.0,0.03])
+# print(Fore.RED+'after force sensor={}'.format(force_sensor))
+#print(env.action_space.sample())
+
+# sum_reward=0
+# for i in range(10):
+#     env.reset()
+#     for i in range(2000):
+#         action=env.action_space.sample()
+#         #action=np.array([0,0,0.47-i/1000])
+#         obs,reward,done,info=env.step(action)
+#       #  print("i={},\naction={},\nobs={},\ndone={},\n".format(i,action,obs,done,))
+#         print(colored("reward={},info={}".format(reward,info),"cyan"))
+#        # print(colored("info={}".format(info),"cyan"))
+#         sum_reward+=reward
+#         if done:
+#             break
+#        # time.sleep(0.1)
+# print()
+# print(sum_reward)
