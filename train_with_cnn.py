@@ -33,7 +33,7 @@ parser.add_argument('--gamma', type=float, default=0.99)
 parser.add_argument('--seed', '-s', type=int, default=0)
 parser.add_argument('--cpu', type=int, default=1)
 parser.add_argument('--epochs', type=int, default=500)
-parser.add_argument('--exp_name', type=str, default='ppo-kuka-cam-reach-with-cnn')
+parser.add_argument('--exp_name', type=str, default='ppo-with-cnn')
 parser.add_argument('--log_dir', type=str, default="./logs")
 args = parser.parse_args()
 
@@ -54,6 +54,6 @@ ppo(env,
     ac_kwargs=dict(hidden_sizes=[args.hid] * args.l),
     gamma=args.gamma,
     seed=args.seed,
-    steps_per_epoch=env.max_steps_one_episode,
+    steps_per_epoch=env.max_steps_one_episode*args.cpu,
     epochs=args.epochs,
     logger_kwargs=logger_kwargs)
