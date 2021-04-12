@@ -112,7 +112,7 @@ class PPOBuffer:
         data = dict(obs=self.obs_buf, act=self.act_buf, ret=self.ret_buf,
                     adv=self.adv_buf, logp=self.logp_buf)
         #data.to(device)
-        return {k: torch.as_tensor(v, dtype=torch.float32) for k,v in data.items()}
+        return {k: torch.as_tensor(v, dtype=torch.float32).to(device) for k,v in data.items()}
 
 
 
@@ -243,9 +243,16 @@ def ppo(env_fn, actor_critic=core.CNNActorCritic, ac_kwargs=dict(), seed=0,
     act_dim = env.action_space.shape
  
     #ac=actor_critic(env.observation_space,env.action_space,**ac_kwargs)
-    ac=torch.load("logs/ppo-with-cnn/ppo-with-cnn_s0/pyt_save/model.pt")
+    if pretrain:
+        ac=torch.load("pretrained/reach-cnn/model.pt")
+    else:
+        ac=actor_critic(env.observation_space,env.action_space,**ac_kwargs)        
 
-    sync_params(ac)
+    if device==torch.device("cuda"):
+        ac.to(device)
+    else:
+        # sync params across processes
+        sync_params(ac)
 
     # Count variables
     def count_vars(module):

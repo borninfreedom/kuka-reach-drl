@@ -1,12 +1,7 @@
 # kuka-reach-drl
 Train kuka robot reach a point with deep rl in pybullet.
 
-* The train process
-![The train process](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train.gif)
-* The evaluate process
-![The evaluate process](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/eval.gif)
-* The average episode reward
-![The average episode reward](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train_results.png)
+![The train process](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train.gif)![The evaluate process](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/eval.gif)![The average episode reward](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train_results.png)
 
 
 
@@ -67,30 +62,30 @@ but I can not ensure this method can success.
 
 if you want to train the kuka with coordition env, whose input to policy is the coordition of the target pos, and the actor critic framework is based on mlp, please run
 ```bash
-python train_reach.py --is_render True --is_good_view True --cpu 6 --epochs 100
+python train_with_mlp.py --is_render  --is_good_view  --cpu 5 --epochs 100
 ```
 if you don't want to view the scene, just train it, run
 ```bash
-python train_reach.py  --cpu 6 --epochs 100
+python train_with_mlp.py  --cpu 5 --epochs 100
 ```
 
 if you want to train kuka with image input and cnn model,run
 ```bash
-python train_cam_reach_with_cnn.py --is_render True --is_good_view True --cpu 6 --epochs 500
+python train_with_cnn.py --is_render  --is_good_view  --cpu 5 --epochs 500
 ```
 if you don't want to view the scene, just train it, run
 ```bash
-python train_cam_reach_with_cnn.py  --cpu 6 --epochs 500
+python train_with_cnn.py  --cpu 5 --epochs 500
 ```
 
 
 if you want to train kuka with image input and lstm model,run
 ```bash
-python train_cam_reach.py --is_render True --is_good_view True --cpu 6 --epochs 500
+python train_with_lstm.py --is_render  --is_good_view  --cpu 5 --epochs 500
 ```
 if you don't want to view the scene, just train it, run
 ```bash
-python train_cam_reach.py --cpu 6 --epochs 500
+python train_with_lstm.py --cpu 5 --epochs 500
 ```
 
 
@@ -138,8 +133,9 @@ More detailed information please visit [plotting results](https://spinningup.ope
 22. [ShangtongZhang/reinforcement-learning-an-introduction](https://github.com/ShangtongZhang/reinforcement-learning-an-introduction), this is the python version code of the book reinforcement learning an introduction second edition, the full book and other resources can be found here [Reinforcement Learning: An Introduction](http://incompleteideas.net/book/the-book-2nd.html).
 
 
-# Machine learning knowledges
+# Machine learning and reinforcement learning knowledges
 * [The Logit and Sigmoid Functions](https://nathanbrixius.wordpress.com/2016/06/04/functions-i-have-known-logit-and-sigmoid/)
+* [Generalized Advantage Estimator](https://zhuanlan.zhihu.com/p/139097326)
 
 # Blogs about deep rl written by me
 1. [Ubuntu助手 — 一键自动安装软件，一键进行系统配置](https://www.guyuehome.com/15107)
@@ -148,7 +144,11 @@ More detailed information please visit [plotting results](https://spinningup.ope
 4. [深度强化学习专栏 —— 3.实现一阶倒立摆](https://www.guyuehome.com/23439)
 5. [深度强化学习专栏 —— 4. 使用ray做分布式计算](https://www.guyuehome.com/?p=26243)
 6. [深度强化学习专栏 —— 5. 使用ray的tune组件优化强化学习算法的超参数](https://www.guyuehome.com/?p=26247)
-
+7. [深度强化学习专栏 —— 6. 使用RLLib和ray进行强化学习训练](https://www.guyuehome.com/26251)
+8. [深度强化学习专栏 —— 7. 实现机械臂reach某点之PPO算法实现（一）](https://www.guyuehome.com/33650)
+9. [深度强化学习专栏 —— 8. 实现机械臂reach某点之PPO算法实现（二）](https://www.guyuehome.com/33663)
+10. [深度强化学习专栏 —— 9. 实现机械臂reach某点之PPO算法实现（三）](https://www.guyuehome.com/33682)
+11. [深度强化学习专栏 —— 10. 实现机械臂reach某点之环境实现实现](https://www.guyuehome.com/33691)
 
 # Blogs about pybullet written by me
 1. [pybullet杂谈 ：使用深度学习拟合相机坐标系与世界坐标系坐标变换关系（一）](https://www.guyuehome.com/24528)
