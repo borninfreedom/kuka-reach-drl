@@ -1,10 +1,12 @@
 # kuka-reach-drl
 Train kuka robot reach a point with deep rl in pybullet.
+<!-- 
+![The train process](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train.gif)![The evaluate process](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/eval.gif)![The average episode reward](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train_results.png) -->
 
-![The train process](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train.gif)![The evaluate process](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/eval.gif)![The average episode reward](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train_results.png)
 
-
-
+The train process|The evaluate process|The average episode reward
+:---------------:|:------------------:|:-------------------------:
+![](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train.gif)|![](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/eval.gif)|![](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train_results.png)
 
 # Installation guide (Now only support linux and macos)
 **I strongly recommend using Conda to install the env, because you will possible encounter the mpi4py error with pip.**
