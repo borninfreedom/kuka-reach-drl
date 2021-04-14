@@ -15,7 +15,6 @@
 import pybullet as p
 import pybullet_data
 import os
-import sys
 import gym
 from gym import spaces
 from gym.utils import seeding
@@ -23,24 +22,26 @@ import numpy as np
 from math import sqrt
 import random
 import time
-from numpy import arange
 import logging
 import math
-from termcolor import colored
+from colorama import Fore,Back,init
+init(autoreset=True)
 
-#### 一些变量 ######
-LOGGING_LEVEL = logging.INFO
-# is_render=False
-# is_good_view=False   #这个的作用是在step时加上time.sleep()，把机械比的动作放慢，看的更清，但是会降低训练速度
-#########################
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(threadName)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s',
+    filename='/logs/kuka_base_env.log',
+    filemode='w')
 
-# logging.basicConfig(
-#     level=LOGGING_LEVEL,
-#     format='%(asctime)s - %(threadName)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s',
-#     filename='../logs/reach_env.log'.format(time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())),
-#     filemode='w')
-# logger = logging.getLogger(__name__)
-# env_logger=logging.getLogger('env.py')
+logger = logging.getLogger(__name__)
+
+formatter = logging.Formatter('%(asctime)s - %(threadName)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s')
+stream_handler = logging.StreamHandler()
+
+stream_handler.setLevel(logging.DEBUG)
+stream_handler.setFormatter(formatter)
+logger.addHandler(stream_handler)
+
 
 # logging模块的使用
 # 级别                何时使用
@@ -51,7 +52,7 @@ LOGGING_LEVEL = logging.INFO
 # CRITICAL    严重的错误，表明程序已不能继续执行
 
 
-class KukaReachEnv(gym.Env):
+class KukaBaseEnv(gym.Env):
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 50
@@ -95,10 +96,12 @@ class KukaReachEnv(gym.Env):
                                            self.z_high_action
                                        ]),
                                        dtype=np.float32)
+
         self.observation_space = spaces.Box(
             low=np.array([self.x_low_obs, self.y_low_obs, self.z_low_obs]),
             high=np.array([self.x_high_obs, self.y_high_obs, self.z_high_obs]),
             dtype=np.float32)
+
         self.step_counter = 0
 
         self.urdf_root_path = pybullet_data.getDataPath()
@@ -111,13 +114,15 @@ class KukaReachEnv(gym.Env):
         # restposes for null space
         self.rest_poses = [0, 0, 0, 0.5 * math.pi, 0, -math.pi * 0.5 * 0.66, 0]
         # joint damping coefficents
-        self.joint_damping = [
+        self.jd = [
+            0.00001, 0.00001, 0.00001, 0.00001, 0.00001, 0.00001, 0.00001,
             0.00001, 0.00001, 0.00001, 0.00001, 0.00001, 0.00001, 0.00001
         ]
 
         self.init_joint_positions = [
             0.006418, 0.413184, -0.011401, -1.589317, 0.005379, 1.137684,
-            -0.006539
+            -0.006539, 0.000048, -0.299912, 0.000000, -0.000043, 0.299960,
+            0.000000, -0.000200
         ]
 
         self.orientation = p.getQuaternionFromEuler(
@@ -168,11 +173,15 @@ class KukaReachEnv(gym.Env):
 
         p.loadURDF(os.path.join(self.urdf_root_path, "plane.urdf"),
                    basePosition=[0, 0, -0.65])
-        self.kuka_id = p.loadURDF(os.path.join(self.urdf_root_path,
-                                               "kuka_iiwa/model.urdf"),
-                                  useFixedBase=True)
-        p.loadURDF(os.path.join(self.urdf_root_path, "table/table.urdf"),
+        
+        self.kuka_id = p.loadSDF(
+            os.path.join(self.urdf_root_path,
+                         "kuka_iiwa/kuka_with_gripper2.sdf"))
+        
+        table_uid=p.loadURDF(os.path.join(self.urdf_root_path, "table/table.urdf"),
                    basePosition=[0.5, 0, -0.65])
+        p.changeVisualShape(table_uid, -1, rgbaColor=[1, 1, 1, 1])
+        
         # p.loadURDF(os.path.join(self.urdf_root_path, "tray/traybox.urdf"),basePosition=[0.55,0,0])
         #object_id=p.loadURDF(os.path.join(self.urdf_root_path, "random_urdfs/000/000.urdf"), basePosition=[0.53,0,0.02])
         self.object_id = p.loadURDF(os.path.join(self.urdf_root_path,
@@ -195,7 +204,8 @@ class KukaReachEnv(gym.Env):
 
         self.robot_pos_obs = p.getLinkState(self.kuka_id,
                                             self.num_joints - 1)[4]
-        #logging.debug("init_pos={}\n".format(p.getLinkState(self.kuka_id,self.num_joints-1)))
+        logger.debug('robot_end_effector_pos={}'.format(self.robot_pos_obs))
+        
         p.stepSimulation()
         self.object_pos = p.getBasePositionAndOrientation(self.object_id)[0]
         return np.array(self.object_pos).astype(np.float32)
