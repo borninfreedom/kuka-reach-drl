@@ -166,3 +166,6 @@ More detailed information please visit [plotting results](https://spinningup.ope
 6. [Part 1.2 - 实现一个井字棋游戏的gym环境](https://blog.csdn.net/bornfree5511/article/details/108214740)
 7. [Part 1.3 - 熟悉PyBullet](https://blog.csdn.net/bornfree5511/article/details/108307638)
 8. [Part 1.4 - 为PyBullet创建Gym环境](https://blog.csdn.net/bornfree5511/article/details/108326084)
+
+# VSCode tricks
+* [python extensions](https://zhuanlan.zhihu.com/p/361654489?utm_source=com.miui.notes&utm_medium=social&utm_oi=903420714332332032)
