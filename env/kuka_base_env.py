@@ -114,7 +114,7 @@ class KukaBaseEnv(gym.Env):
         # restposes for null space
         self.rest_poses = [0, 0, 0, 0.5 * math.pi, 0, -math.pi * 0.5 * 0.66, 0]
         # joint damping coefficents
-        self.jd = [
+        self.joint_damping = [
             0.00001, 0.00001, 0.00001, 0.00001, 0.00001, 0.00001, 0.00001,
             0.00001, 0.00001, 0.00001, 0.00001, 0.00001, 0.00001, 0.00001
         ]
@@ -122,8 +122,7 @@ class KukaBaseEnv(gym.Env):
         self.init_joint_positions = [
             0.006418, 0.413184, -0.011401, -1.589317, 0.005379, 1.137684,
             -0.006539, 0.000048, -0.299912, 0.000000, -0.000043, 0.299960,
-            0.000000, -0.000200
-        ]
+            0.000000, -0.000200]
 
         self.orientation = p.getQuaternionFromEuler(
             [0., -math.pi, math.pi / 2.])
@@ -194,7 +193,8 @@ class KukaBaseEnv(gym.Env):
                                     ])
 
         self.num_joints = p.getNumJoints(self.kuka_id)
-
+        logger.debug(Fore.RED+'num joints={}'.format(self.num_joints))
+        
         for i in range(self.num_joints):
             p.resetJointState(
                 bodyUniqueId=self.kuka_id,
@@ -236,6 +236,9 @@ class KukaBaseEnv(gym.Env):
             targetOrientation=self.orientation,
             jointDamping=self.joint_damping,
         )
+        logger.debug(Fore.BLUE+'robot joint positions={}'.format(self.robot_joint_positions))
+        logger.debug(Fore.RED+'num joints shape={}'.format(len(range(self.num_joints))))
+        logger.debug(Fore.CYAN+'robot joint position shape={}'.format(len(self.robot_joint_positions)))
         for i in range(self.num_joints):
             p.resetJointState(
                 bodyUniqueId=self.kuka_id,
