@@ -1,7 +1,6 @@
 # kuka-reach-drl
 Train kuka robot reach a point with deep rl in pybullet.
-<!-- 
-![The train process](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train.gif)![The evaluate process](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/eval.gif)![The average episode reward](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/train_results.png) -->
+
 
 
 The train process with mlp|The evaluate process with mlp|train plot
@@ -173,5 +172,64 @@ More detailed information please visit [plotting results](https://spinningup.ope
 
 ## Papers
 * [Setting up a Reinforcement Learning Task with a Real-World Robot](https://arxiv.org/pdf/1803.07067.pdf)
-* [入门机器人强化学习的一些坑：模拟环境篇](https://zhuanlan.zhihu.com/p/300541709)
 * [Real-World Human-Robot Collaborative Reinforcement Learning](https://arxiv.org/pdf/2003.01156.pdf)
+
+## Blogs
+* [入门机器人强化学习的一些坑：模拟环境篇](https://zhuanlan.zhihu.com/p/300541709)
+
+
+# VSCode tricks
+## [About python extensions](https://zhuanlan.zhihu.com/p/361654489?utm_source=com.miui.notes&utm_medium=social&utm_oi=903420714332332032)
+
+## Resolve a.py in A folder import b.py in B folder
+* Add the codes below at the top of a .py file
+```python
+import os,inspect
+current_dir=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+os.chdir(current_dir)
+import sys
+sys.path.append('../')
+```
+## Add header template in .py files
+* Select FIle -> Preference -> User Snippets -> 选择python文件
+* Add the codes below
+```python
+
+{
+	// Place your snippets for python here. Each snippet is defined under a snippet name and has a prefix, body and 
+	// description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. Placeholders with the 
+	// same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+
+
+	
+	"HEADER":{
+		"prefix": "header",
+		"body": [
+		"#!/usr/bin/env python3",
+		"# -*- encoding: utf-8 -*-",
+		"'''",
+		"@File    :   $TM_FILENAME",
+		"@Time    :   $CURRENT_YEAR/$CURRENT_MONTH/$CURRENT_DATE $CURRENT_HOUR:$CURRENT_MINUTE:$CURRENT_SECOND",
+		"@Author  :   Yan Wen ",
+		"@Version :   1.0",
+		"@Contact :   z19040042@s.upc.edu.cn",
+		"@Desc    :   None",
+		
+		"'''",
+		"",
+		"# here put the import lib",
+		"$1"
+	],
+	}	
+}
+```
