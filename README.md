@@ -168,9 +168,9 @@ More detailed information please visit [plotting results](https://spinningup.ope
 8. [Part 1.4 - 为PyBullet创建Gym环境](https://blog.csdn.net/bornfree5511/article/details/108326084)
 
 # VSCode tricks
-* [python extensions](https://zhuanlan.zhihu.com/p/361654489?utm_source=com.miui.notes&utm_medium=social&utm_oi=903420714332332032)
-* Resolve a.py in A folder import b.py in B folder
-Add the codes below at the top of a .py file
+## [python extensions](https://zhuanlan.zhihu.com/p/361654489?utm_source=com.miui.notes&utm_medium=social&utm_oi=903420714332332032)
+## Resolve a.py in A folder import b.py in B folder
+* Add the codes below at the top of a .py file
 ```python
 import os,inspect
 current_dir=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -178,10 +178,11 @@ os.chdir(current_dir)
 import sys
 sys.path.append('../')
 ```
-* Add header template in .py files
+## Add header template in .py files
+* Select FIle -> Preference -> User Snippets -> 选择python文件
+* Add the codes below
 ```python
-# Select FIle -> Preference -> User Snippets -> 选择python文件
-# Add the codes below
+
 {
 	// Place your snippets for python here. Each snippet is defined under a snippet name and has a prefix, body and 
 	// description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
