@@ -30,7 +30,7 @@ init(autoreset=True)
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(threadName)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s',
-    filename='/logs/kuka_base_env.log',
+    filename='./logs/kuka_base_env.log',
     filemode='w')
 
 logger = logging.getLogger(__name__)
@@ -57,7 +57,7 @@ class KukaBaseEnv(gym.Env):
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 50
     }
-    max_steps_one_episode = 1000
+    max_steps_one_episode = 100
 
     def __init__(self, is_render=False, is_good_view=False):
 
@@ -176,7 +176,7 @@ class KukaBaseEnv(gym.Env):
         
         self.kuka_id = p.loadSDF(
             os.path.join(self.urdf_root_path,
-                         "kuka_iiwa/kuka_with_gripper2.sdf"))
+                         "kuka_iiwa/kuka_with_gripper2.sdf"))[0]   # The return of loadSDF is a tuple (0,)
         
         table_uid=p.loadURDF(os.path.join(self.urdf_root_path, "table/table.urdf"),
                    basePosition=[0.5, 0, -0.65])
@@ -204,15 +204,15 @@ class KukaBaseEnv(gym.Env):
 
         self.robot_pos_obs = p.getLinkState(self.kuka_id,
                                             self.num_joints - 1)[4]
-        logger.debug('robot_end_effector_pos={}'.format(self.robot_pos_obs))
+        logger.debug(Fore.RED+'robot_end_effector_pos={}'.format(self.robot_pos_obs))
         
         p.stepSimulation()
         self.object_pos = p.getBasePositionAndOrientation(self.object_id)[0]
-        return np.array(self.object_pos).astype(np.float32)
-        #return np.array(self.robot_pos_obs).astype(np.float32)
+        return self.resolve_reset_return()
 
     def resolve_reset_return(self):
-        
+        raise NotImplementedError
+    
     def step(self, action):
         dv = 0.005
         dx = action[0] * dv
@@ -288,7 +288,7 @@ class KukaBaseEnv(gym.Env):
             reward = -0.1
             self.terminated = True
 
-        elif self.distance < 0.1:
+        elif self.distance < 0.05:
             reward = 1
             self.terminated = True
         else:
