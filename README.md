@@ -170,6 +170,7 @@ More detailed information please visit [plotting results](https://spinningup.ope
 # VSCode tricks
 * [python extensions](https://zhuanlan.zhihu.com/p/361654489?utm_source=com.miui.notes&utm_medium=social&utm_oi=903420714332332032)
 * Resolve a.py in A folder import b.py in B folder
+Add the codes below at the top of a .py file
 ```python
 import os,inspect
 current_dir=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
