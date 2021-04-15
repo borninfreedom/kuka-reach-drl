@@ -211,6 +211,8 @@ class KukaBaseEnv(gym.Env):
         return np.array(self.object_pos).astype(np.float32)
         #return np.array(self.robot_pos_obs).astype(np.float32)
 
+    def resolve_reset_return(self):
+        
     def step(self, action):
         dv = 0.005
         dx = action[0] * dv

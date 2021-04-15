@@ -166,3 +166,12 @@ More detailed information please visit [plotting results](https://spinningup.ope
 6. [Part 1.2 - 实现一个井字棋游戏的gym环境](https://blog.csdn.net/bornfree5511/article/details/108214740)
 7. [Part 1.3 - 熟悉PyBullet](https://blog.csdn.net/bornfree5511/article/details/108307638)
 8. [Part 1.4 - 为PyBullet创建Gym环境](https://blog.csdn.net/bornfree5511/article/details/108326084)
+
+# Some resources about how to implement the RL to real robots
+## Source codes
+* [kindredresearch/SenseAct](https://github.com/kindredresearch/SenseAct)
+
+## Papers
+* [Setting up a Reinforcement Learning Task with a Real-World Robot](https://arxiv.org/pdf/1803.07067.pdf)
+* [入门机器人强化学习的一些坑：模拟环境篇](https://zhuanlan.zhihu.com/p/300541709)
+* [Real-World Human-Robot Collaborative Reinforcement Learning](https://arxiv.org/pdf/2003.01156.pdf)
