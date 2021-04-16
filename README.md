@@ -233,3 +233,8 @@ sys.path.append('../')
 	}	
 }
 ```
+## Python log
+* [Delgan/loguru](https://github.com/Delgan/loguru), this is a great python log module, it is much greater than python built in logging module.
+
+# People in relative projects
+* [Yang Guan](https://idthanm.github.io/)
