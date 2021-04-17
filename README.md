@@ -179,6 +179,10 @@ More detailed information please visit [plotting results](https://spinningup.ope
 ## Blogs
 * [入门机器人强化学习的一些坑：模拟环境篇](https://zhuanlan.zhihu.com/p/300541709)
 
+## Some comments from Facebook groups
+ 0|1|2|3
+--|--|--|--
+![](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/rosrl0.jpg)|![](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/rosrl1.jpg)|![](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/rosrl2.jpg)|![](https://github.com/borninfreedom/kuka-reach-drl/blob/main/pictures/rosrl3.jpg)
 
 # VSCode tricks
 ## [About python extensions](https://zhuanlan.zhihu.com/p/361654489?utm_source=com.miui.notes&utm_medium=social&utm_oi=903420714332332032)
