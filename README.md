@@ -242,5 +242,7 @@ sys.path.append('../')
 ## Python log
 * [Delgan/loguru](https://github.com/Delgan/loguru), this is a great python log module, it is much greater than python built in logging module.
 
+## deep rl data plot
+* [wandb](https://wandb.ai/site),Developer tools for machine learning. Build better models faster with experiment tracking, dataset .
 # People in relative projects
 * [Yang Guan](https://idthanm.github.io/)

@@ -1,4 +1,5 @@
 logs
+cpp_algos
 *.log
 .idea
 __pycache__
