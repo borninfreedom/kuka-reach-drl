@@ -144,6 +144,15 @@ More detailed information please visit [plotting results](https://spinningup.ope
 # Machine learning and reinforcement learning knowledges
 * [The Logit and Sigmoid Functions](https://nathanbrixius.wordpress.com/2016/06/04/functions-i-have-known-logit-and-sigmoid/)
 * [Generalized Advantage Estimator](https://zhuanlan.zhihu.com/p/139097326)
+* [Python浮点算术：争议和限制](https://docs.python.org/zh-cn/3/tutorial/floatingpoint.html)
+
+# Robotics knowledge
+* [回到基础——理解几何旋转与欧拉角](https://robodk.com/cn/blog/%E5%87%A0%E4%BD%95%E6%97%8B%E8%BD%AC%E4%B8%8E%E6%AC%A7%E6%8B%89%E8%A7%92/)
+
+# Python Knowledge
+* [Python中的作用域、global与nonlocal](https://note.qidong.name/2017/07/python-legb/)
+* [Delgan/loguru](https://github.com/Delgan/loguru), this is a great python log module, it is much greater than python built in logging module.
+* [wandb](https://wandb.ai/site),Developer tools for machine learning. Build better models faster with experiment tracking, dataset .
 
 # Blogs about deep rl written by me
 1. [Ubuntu助手 — 一键自动安装软件，一键进行系统配置](https://www.guyuehome.com/15107)
@@ -239,10 +248,6 @@ sys.path.append('../')
 	}	
 }
 ```
-## Python log
-* [Delgan/loguru](https://github.com/Delgan/loguru), this is a great python log module, it is much greater than python built in logging module.
 
-## deep rl data plot
-* [wandb](https://wandb.ai/site),Developer tools for machine learning. Build better models faster with experiment tracking, dataset .
 # People in relative projects
 * [Yang Guan](https://idthanm.github.io/)

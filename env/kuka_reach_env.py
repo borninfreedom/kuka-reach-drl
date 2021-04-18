@@ -295,7 +295,7 @@ class KukaReachEnv(gym.Env):
 
 if __name__ == '__main__':
     # 这一部分是做baseline，即让机械臂随机选择动作，看看能够得到的分数
-    env = KukaReachEnv()
+    env = KukaReachEnv(is_render=True,is_good_view=True)
     print(env)
     print(env.observation_space.shape)
     # print(env.observation_space.sample())
@@ -303,19 +303,19 @@ if __name__ == '__main__':
     print(env.action_space.shape)
     obs = env.reset()
     print(obs)
-    # sum_reward=0
-    # for i in range(10):
-    #     env.reset()
-    #     for i in range(2000):
-    #         action=env.action_space.sample()
-    #         #action=np.array([0,0,0.47-i/1000])
-    #         obs,reward,done,info=env.step(action)
-    #       #  print("i={},\naction={},\nobs={},\ndone={},\n".format(i,action,obs,done,))
-    #         print(colored("reward={},info={}".format(reward,info),"cyan"))
-    #        # print(colored("info={}".format(info),"cyan"))
-    #         sum_reward+=reward
-    #         if done:
-    #             break
-    #        # time.sleep(0.1)
-    # print()
-    # print(sum_reward)
+    sum_reward=0
+    for i in range(10):
+        env.reset()
+        for i in range(2000):
+            action=env.action_space.sample()
+            #action=np.array([0,0,0.47-i/1000])
+            obs,reward,done,info=env.step(action)
+          #  print("i={},\naction={},\nobs={},\ndone={},\n".format(i,action,obs,done,))
+            print(colored("reward={},info={}".format(reward,info),"cyan"))
+           # print(colored("info={}".format(info),"cyan"))
+            sum_reward+=reward
+            if done:
+                break
+           # time.sleep(0.1)
+    print()
+    print(sum_reward)

@@ -6,7 +6,6 @@
 @Author  :   Yan Wen 
 @Version :   1.0
 @Contact :   z19040042@s.upc.edu.cn
-@License :   (C)Copyright 2021-2022, Liugroup-NLPR-CASIA
 @Desc    :   None
 '''
 
@@ -22,34 +21,14 @@ import numpy as np
 from math import sqrt
 import random
 import time
-import logging
 import math
-from colorama import Fore,Back,init
+from colorama import Fore, Back, init
+
 init(autoreset=True)
+import sys
+from loguru import logger
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(threadName)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s',
-    filename='./logs/kuka_base_env.log',
-    filemode='w')
-
-logger = logging.getLogger(__name__)
-
-formatter = logging.Formatter('%(asctime)s - %(threadName)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s')
-stream_handler = logging.StreamHandler()
-
-stream_handler.setLevel(logging.DEBUG)
-stream_handler.setFormatter(formatter)
-logger.addHandler(stream_handler)
-
-
-# logging模块的使用
-# 级别                何时使用
-# DEBUG       细节信息，仅当诊断问题时适用。
-# INFO        确认程序按预期运行
-# WARNING     表明有已经或即将发生的意外（例如：磁盘空间不足）。程序仍按预期进行
-# ERROR       由于严重的问题，程序的某些功能已经不能正常执行
-# CRITICAL    严重的错误，表明程序已不能继续执行
+logger.add(sys.stdout, level="DEBUG")
 
 
 class KukaBaseEnv(gym.Env):
@@ -57,7 +36,7 @@ class KukaBaseEnv(gym.Env):
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 50
     }
-    max_steps_one_episode = 100
+    max_steps_one_episode = 1000
 
     def __init__(self, is_render=False, is_good_view=False):
 
@@ -104,6 +83,9 @@ class KukaBaseEnv(gym.Env):
 
         self.step_counter = 0
 
+        self.end_effector_index = 6
+        self.gripper_index = 7
+
         self.urdf_root_path = pybullet_data.getDataPath()
         # lower limits for null space
         self.lower_limits = [-.967, -2, -2.96, 0.19, -2.96, -2.09, -3.05]
@@ -122,10 +104,13 @@ class KukaBaseEnv(gym.Env):
         self.init_joint_positions = [
             0.006418, 0.413184, -0.011401, -1.589317, 0.005379, 1.137684,
             -0.006539, 0.000048, -0.299912, 0.000000, -0.000043, 0.299960,
-            0.000000, -0.000200]
+            0.000000, -0.000200
+        ]
 
         self.orientation = p.getQuaternionFromEuler(
             [0., -math.pi, math.pi / 2.])
+
+        self.gripper_length = 0.257
 
         self.seed()
         self.reset()
@@ -172,82 +157,78 @@ class KukaBaseEnv(gym.Env):
 
         p.loadURDF(os.path.join(self.urdf_root_path, "plane.urdf"),
                    basePosition=[0, 0, -0.65])
-        
+
         self.kuka_id = p.loadSDF(
             os.path.join(self.urdf_root_path,
-                         "kuka_iiwa/kuka_with_gripper2.sdf"))[0]   # The return of loadSDF is a tuple (0,)
-        
-        table_uid=p.loadURDF(os.path.join(self.urdf_root_path, "table/table.urdf"),
-                   basePosition=[0.5, 0, -0.65])
-        p.changeVisualShape(table_uid, -1, rgbaColor=[1, 1, 1, 1])
-        
-        # p.loadURDF(os.path.join(self.urdf_root_path, "tray/traybox.urdf"),basePosition=[0.55,0,0])
-        #object_id=p.loadURDF(os.path.join(self.urdf_root_path, "random_urdfs/000/000.urdf"), basePosition=[0.53,0,0.02])
-        self.object_id = p.loadURDF(os.path.join(self.urdf_root_path,
-                                                 "random_urdfs/000/000.urdf"),
-                                    basePosition=[
-                                        random.uniform(self.x_low_obs,
-                                                       self.x_high_obs),
-                                        random.uniform(self.y_low_obs,
-                                                       self.y_high_obs), 0.01
-                                    ])
+                         "kuka_iiwa/kuka_with_gripper2.sdf"))[0]
+        # The return of loadSDF is a tuple (0,)
 
-        self.num_joints = p.getNumJoints(self.kuka_id)
-        logger.debug(Fore.RED+'num joints={}'.format(self.num_joints))
-        
-        for i in range(self.num_joints):
+        table_uid = p.loadURDF(os.path.join(self.urdf_root_path,
+                                            "table/table.urdf"),
+                               basePosition=[0.5, 0, -0.65])
+        p.changeVisualShape(table_uid, -1, rgbaColor=[1, 1, 1, 1])
+
+        self.object_id = p.loadURDF(
+            os.path.join(self.urdf_root_path, "random_urdfs/000/000.urdf"),
+            basePosition=[
+                random.uniform(self.x_low_obs, self.x_high_obs),
+                random.uniform(self.y_low_obs, self.y_high_obs), 0.01
+            ],
+            baseOrientation=p.getQuaternionFromEuler([0, 0, 0]))
+
+        for i in range(p.getNumJoints(self.kuka_id)):
             p.resetJointState(
                 bodyUniqueId=self.kuka_id,
                 jointIndex=i,
                 targetValue=self.init_joint_positions[i],
             )
 
-        self.robot_pos_obs = p.getLinkState(self.kuka_id,
-                                            self.num_joints - 1)[4]
-        logger.debug(Fore.RED+'robot_end_effector_pos={}'.format(self.robot_pos_obs))
-        
         p.stepSimulation()
-        self.object_pos = p.getBasePositionAndOrientation(self.object_id)[0]
-        return self.resolve_reset_return()
+        return self._resolve_obs_return()
 
-    def resolve_reset_return(self):
-        raise NotImplementedError
-    
+    def _resolve_obs_return(self):
+        object_position = list(
+            p.getBasePositionAndOrientation(self.object_id)[0])
+        robot_end_effector_position = list(
+            p.getLinkState(self.kuka_id, self.end_effector_index)[4])
+        logger.debug(Fore.BLUE + 'object_position={}'.format(object_position))
+        logger.debug(Fore.YELLOW + 'robot end effector position={}'.format(
+            robot_end_effector_position))
+
+        return np.array(object_position + robot_end_effector_position).astype(
+            np.float32)
+
     def step(self, action):
         dv = 0.005
         dx = action[0] * dv
         dy = action[1] * dv
         dz = action[2] * dv
 
-        self.current_pos = p.getLinkState(self.kuka_id, self.num_joints - 1)[4]
-        # logging.debug("self.current_pos={}\n".format(self.current_pos))
-        self.new_robot_pos = [
-            self.current_pos[0] + dx, self.current_pos[1] + dy,
-            self.current_pos[2] + dz
+        current_pos = np.array(p.getLinkState(self.kuka_id, self.end_effector_index)[4]).astype(np.float32)
+    
+        new_robot_pos = [
+            current_pos[0] + dx, current_pos[1] + dy, current_pos[2] + dz
         ]
-        #logging.debug("self.new_robot_pos={}\n".format(self.new_robot_pos))
-        self.robot_joint_positions = p.calculateInverseKinematics(
+       
+        robot_joint_positions = p.calculateInverseKinematics(
             bodyUniqueId=self.kuka_id,
-            endEffectorLinkIndex=self.num_joints - 1,
+            endEffectorLinkIndex=self.end_effector_index,
             targetPosition=[
-                self.new_robot_pos[0], self.new_robot_pos[1],
-                self.new_robot_pos[2]
+                new_robot_pos[0], new_robot_pos[1], new_robot_pos[2]
             ],
             targetOrientation=self.orientation,
             jointDamping=self.joint_damping,
         )
-        logger.debug(Fore.BLUE+'robot joint positions={}'.format(self.robot_joint_positions))
-        logger.debug(Fore.RED+'num joints shape={}'.format(len(range(self.num_joints))))
-        logger.debug(Fore.CYAN+'robot joint position shape={}'.format(len(self.robot_joint_positions)))
-        for i in range(self.num_joints):
+
+        for i in range(self.end_effector_index):
             p.resetJointState(
                 bodyUniqueId=self.kuka_id,
                 jointIndex=i,
-                targetValue=self.robot_joint_positions[i],
+                targetValue=robot_joint_positions[i],
             )
         p.stepSimulation()
 
-        #在代码开始部分，如果定义了is_good_view，那么机械臂的动作会变慢，方便观察
+   
         if self.is_good_view:
             time.sleep(0.05)
 
@@ -256,28 +237,27 @@ class KukaBaseEnv(gym.Env):
 
     def _reward(self):
 
-        #一定注意是取第4个值，请参考pybullet手册的这个函数返回值的说明
-        self.robot_state = p.getLinkState(self.kuka_id, self.num_joints - 1)[4]
-        # self.object_state=p.getBasePositionAndOrientation(self.object_id)
-        # self.object_state=np.array(self.object_state).astype(np.float32)
-        #
-        self.object_state = np.array(
+        robot_end_effector_position = np.array(p.getLinkState(
+            self.kuka_id, self.end_effector_index)[4]).astype(np.float32)
+
+        # We got the position of the robot end effector not gripper end effector,
+        # so we need to compasent the gripper length
+        # What we want is the gripper end effector position
+        robot_end_effector_position[2] += self.gripper_length
+        object_position = np.array(
             p.getBasePositionAndOrientation(self.object_id)[0]).astype(
                 np.float32)
 
-        square_dx = (self.robot_state[0] - self.object_state[0])**2
-        square_dy = (self.robot_state[1] - self.object_state[1])**2
-        square_dz = (self.robot_state[2] - self.object_state[2])**2
+        square_dx = (robot_end_effector_position[0] - object_position[0])**2
+        square_dy = (robot_end_effector_position[1] - object_position[1])**2
+        square_dz = (robot_end_effector_position[2] - object_position[2])**2
 
-        #用机械臂末端和物体的距离作为奖励函数的依据
-        self.distance = sqrt(square_dx + square_dy + square_dz)
-        #print(self.distance)
+        distance = np.float32(sqrt(square_dx + square_dy + square_dz))
 
-        x = self.robot_state[0]
-        y = self.robot_state[1]
-        z = self.robot_state[2]
+        x = robot_end_effector_position[0]
+        y = robot_end_effector_position[1]
+        z = robot_end_effector_position[2]
 
-        #如果机械比末端超过了obs的空间，也视为done，而且会给予一定的惩罚
         terminated = bool(x < self.x_low_obs or x > self.x_high_obs
                           or y < self.y_low_obs or y > self.y_high_obs
                           or z < self.z_low_obs or z > self.z_high_obs)
@@ -286,7 +266,6 @@ class KukaBaseEnv(gym.Env):
             reward = -0.1
             self.terminated = True
 
-        #如果机械臂一直无所事事，在最大步数还不能接触到物体，也需要给一定的惩罚
         elif self.step_counter > self.max_steps_one_episode:
             reward = -0.1
             self.terminated = True
@@ -298,11 +277,9 @@ class KukaBaseEnv(gym.Env):
             reward = 0
             self.terminated = False
 
-        info = {'distance:', self.distance}
-        #self.observation=self.robot_state
-        self.observation = self.object_state
-        return np.array(self.observation).astype(
-            np.float32), reward, self.terminated, info
+        info = {'distance:', distance}
+
+        return self._resolve_obs_return(), reward, self.terminated, info
 
     def close(self):
         p.disconnect()
@@ -310,27 +287,32 @@ class KukaBaseEnv(gym.Env):
 
 if __name__ == '__main__':
     # 这一部分是做baseline，即让机械臂随机选择动作，看看能够得到的分数
-    env = KukaReachEnv()
-    print(env)
+    env = KukaBaseEnv()
+    print('env={}'.format(env))
     print(env.observation_space.shape)
     # print(env.observation_space.sample())
     # print(env.action_space.sample())
     print(env.action_space.shape)
     obs = env.reset()
-    print(obs)
-    # sum_reward=0
-    # for i in range(10):
-    #     env.reset()
-    #     for i in range(2000):
-    #         action=env.action_space.sample()
-    #         #action=np.array([0,0,0.47-i/1000])
-    #         obs,reward,done,info=env.step(action)
-    #       #  print("i={},\naction={},\nobs={},\ndone={},\n".format(i,action,obs,done,))
-    #         print(colored("reward={},info={}".format(reward,info),"cyan"))
-    #        # print(colored("info={}".format(info),"cyan"))
-    #         sum_reward+=reward
-    #         if done:
-    #             break
-    #        # time.sleep(0.1)
-    # print()
-    # print(sum_reward)
+    print(Fore.RED + 'obs={}'.format(obs))
+    action=env.action_space.sample()
+    obs,reward,done,info=env.step(action)
+    print('obs={},reward={},done={},info={}'.format(obs,reward,done,info))
+    
+    sum_reward=0
+    success_times=0
+    for i in range(50):
+        env.reset()
+        for i in range(1000):
+            action=env.action_space.sample()
+            obs,reward,done,info=env.step(action)
+            print('obs={},reward={},done={},info={}'.format(obs,reward,done,info))
+            sum_reward+=reward
+            if reward==1:
+                success_times+=1
+            if done:
+                break
+           # time.sleep(0.1)
+    print()
+    print('sum_reward={}'.format(sum_reward))
+    print('success rate={}'.format(success_times/50))
