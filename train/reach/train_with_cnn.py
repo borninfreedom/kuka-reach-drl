@@ -12,6 +12,11 @@
 
 # here put the import lib
 
+import os,inspect
+current_dir=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+os.chdir(current_dir)
+import sys
+sys.path.append('../../')
 
 from env.kuka_cam_reach import KukaCamReachEnv,CustomSkipFrame
 from ppo.ppo_cnn import ppo

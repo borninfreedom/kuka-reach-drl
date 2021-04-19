@@ -12,13 +12,16 @@
 
 # here put the import lib
 
+import os,inspect
+current_dir=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+os.chdir(current_dir)
+import sys
+sys.path.append('../../')
 
-from env.kuka_cam_reach import KukaCamReachEnv,CustomSkipFrame
-from ppo.ppo_lstm import ppo
+from env.kuka_reach_env import KukaReachEnv
+from ppo.ppo import ppo
 from spinup.utils.mpi_tools import mpi_fork
-import ppo.core_lstm as core
-from ppo.core_lstm import userActor,userCritic
-
+import ppo.core as core
 
 import argparse
 
@@ -37,16 +40,14 @@ parser.add_argument('--seed', '-s', type=int, default=0)
 parser.add_argument('--cpu', type=int, default=1)
 parser.add_argument('--steps', type=int, default=4000)
 parser.add_argument('--epochs', type=int, default=100)
-parser.add_argument('--exp_name', type=str, default='ppo-kuka-cam-reach')
+parser.add_argument('--exp_name', type=str, default='ppo-kuka-reach')
 parser.add_argument('--log_dir', type=str, default="./logs")
 args = parser.parse_args()
 
 
 
-env=KukaCamReachEnv(is_render=args.is_render,is_good_view=args.is_good_view)
-env=CustomSkipFrame(env)
+env=KukaReachEnv(is_render=args.is_render,is_good_view=args.is_good_view)
 
-print('env={}'.format(env))
 mpi_fork(args.cpu)  # run parallel code with mpi
 
 from spinup.utils.run_utils import setup_logger_kwargs
@@ -54,8 +55,7 @@ from spinup.utils.run_utils import setup_logger_kwargs
 logger_kwargs = setup_logger_kwargs(args.exp_name, args.seed,data_dir=args.log_dir)
 
 ppo(env,
-    actor=userActor,
-    critic=userCritic,
+    actor_critic=core.MLPActorCritic,
     ac_kwargs=dict(hidden_sizes=[args.hid] * args.l),
     gamma=args.gamma,
     seed=args.seed,

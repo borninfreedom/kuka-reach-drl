@@ -145,6 +145,8 @@ More detailed information please visit [plotting results](https://spinningup.ope
 * [The Logit and Sigmoid Functions](https://nathanbrixius.wordpress.com/2016/06/04/functions-i-have-known-logit-and-sigmoid/)
 * [Generalized Advantage Estimator](https://zhuanlan.zhihu.com/p/139097326)
 * [Python浮点算术：争议和限制](https://docs.python.org/zh-cn/3/tutorial/floatingpoint.html)
+* [rainbow-is-all-you-need](https://github.com/Curt-Park/rainbow-is-all-you-need)
+* [pg-is-all-you-need](https://github.com/MrSyee/pg-is-all-you-need)
 
 # Robotics knowledge
 * [回到基础——理解几何旋转与欧拉角](https://robodk.com/cn/blog/%E5%87%A0%E4%BD%95%E6%97%8B%E8%BD%AC%E4%B8%8E%E6%AC%A7%E6%8B%89%E8%A7%92/)
@@ -153,6 +155,26 @@ More detailed information please visit [plotting results](https://spinningup.ope
 * [Python中的作用域、global与nonlocal](https://note.qidong.name/2017/07/python-legb/)
 * [Delgan/loguru](https://github.com/Delgan/loguru), this is a great python log module, it is much greater than python built in logging module.
 * [wandb](https://wandb.ai/site),Developer tools for machine learning. Build better models faster with experiment tracking, dataset .
+* logging usage
+```python
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(threadName)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s',
+    filename='./logs/client1-{}.log'.format(time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())),
+    filemode='w')
+logger = logging.getLogger(__name__)
+
+formatter = logging.Formatter('%(asctime)s - %(threadName)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s')
+stream_handler = logging.StreamHandler()
+
+stream_handler.setLevel(logging.INFO)
+stream_handler.setFormatter(formatter)
+logger.addHandler(stream_handler)
+
+# in the codes.
+# logger.info()
+# logger.debug()
+```
 
 # Blogs about deep rl written by me
 1. [Ubuntu助手 — 一键自动安装软件，一键进行系统配置](https://www.guyuehome.com/15107)
@@ -251,3 +273,7 @@ sys.path.append('../')
 
 # People in relative projects
 * [Yang Guan](https://idthanm.github.io/)
+
+# Details about RL
+* 强化学习中的CNN一般没有池化层，池化层会让你获得平移不变性，即网络对图像中对象的位置变得不敏感。这对于 ImageNet 这样的分类任务来说是有意义的，但游戏中位置对潜在的奖励至关重要，我们不希望丢失这些信息。
+* 经验回放的动机是：①深度神经网络作为有监督学习模型，要求数据满足独立同分布；②通过强化学习采集的数据之间存在着关联性，利用这些数据进行顺序训练，神经网络表现不稳定，而经验回放可以打破数据间的关联。
