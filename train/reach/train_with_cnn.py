@@ -39,7 +39,7 @@ parser.add_argument('--seed', '-s', type=int, default=0)
 parser.add_argument('--cpu', type=int, default=1)
 parser.add_argument('--epochs', type=int, default=500)
 parser.add_argument('--exp_name', type=str, default='ppo-with-cnn-restore')
-parser.add_argument('--log_dir', type=str, default="./logs")
+parser.add_argument('--log_dir', type=str, default="../../logs")
 args = parser.parse_args()
 
 

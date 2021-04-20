@@ -43,7 +43,7 @@ parser.add_argument('--cpu', type=int, default=1)
 parser.add_argument('--steps', type=int, default=4000)
 parser.add_argument('--epochs', type=int, default=100)
 parser.add_argument('--exp_name', type=str, default='ppo-kuka-cam-reach')
-parser.add_argument('--log_dir', type=str, default="./logs")
+parser.add_argument('--log_dir', type=str, default="../../logs")
 args = parser.parse_args()
 
 

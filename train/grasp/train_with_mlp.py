@@ -41,7 +41,7 @@ parser.add_argument('--cpu', type=int, default=5)
 parser.add_argument('--steps', type=int, default=4000)
 parser.add_argument('--epochs', type=int, default=500)
 parser.add_argument('--exp_name', type=str, default='ppo-kuka-grasp-with-mlp')
-parser.add_argument('--log_dir', type=str, default="./logs")
+parser.add_argument('--log_dir', type=str, default="../../logs")
 args = parser.parse_args()
 
 

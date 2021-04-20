@@ -11,10 +11,13 @@
 '''
 
 # here put the import lib
-import os,inspect
-current_dir=os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+import os, inspect
+
+current_dir = os.path.dirname(
+    os.path.abspath(inspect.getfile(inspect.currentframe())))
 os.chdir(current_dir)
 import sys
+
 sys.path.append('../../')
 
 from env.kuka_grasp_env import KukaGraspEnv
@@ -25,25 +28,24 @@ import torch
 # import os
 # print(os.getcwd())
 
-env=KukaGraspEnv(is_good_view=True,is_render=True)
-obs=env.reset()
+env = KukaGraspEnv(is_good_view=True, is_render=True)
+obs = env.reset()
 
-ac=torch.load("../../pretrained/grasp/model.pt")
+ac = torch.load("../../pretrained/grasp/model.pt")
 print('ac={}'.format(ac))
 
-actions=ac.act(torch.as_tensor(obs,dtype=torch.float32))
+actions = ac.act(torch.as_tensor(obs, dtype=torch.float32))
 
 print('actions={}'.format(actions))
 
-sum_reward=0
+sum_reward = 0
 for i in range(50):
-    obs=env.reset()
+    obs = env.reset()
     for step in range(1000):
-        actions=ac.act(torch.as_tensor(obs,dtype=torch.float32))
-        obs,reward,done,info=env.step(actions)
-        sum_reward+=reward
+        actions = ac.act(torch.as_tensor(obs, dtype=torch.float32))
+        obs, reward, done, info = env.step(actions)
+        sum_reward += reward
         if done:
             break
 
 print('sum reward={}'.format(sum_reward))
-
