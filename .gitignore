@@ -6,3 +6,4 @@ __pycache__
 .vscode
 .spyproject
 python_algos
+*.out

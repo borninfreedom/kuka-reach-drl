@@ -36,7 +36,9 @@ import sys
 
 logger = logging.getLogger(__name__)
 
-formatter = logging.Formatter('%(asctime)s - %(threadName)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s')
+formatter = logging.Formatter(
+    '%(asctime)s - %(threadName)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s'
+)
 
 stream_handler = logging.StreamHandler()
 
@@ -45,7 +47,7 @@ stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
 
-class KukaGraspEnv(gym.Env):
+class KukaGripperReachEnv(gym.Env):
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 50
@@ -203,6 +205,11 @@ class KukaGraspEnv(gym.Env):
                 targetValue=self.init_joint_positions[i],
             )
 
+        p.resetJointState(self.kuka_id, 8, -0.3)
+        p.resetJointState(self.kuka_id, 10, 0)
+        p.resetJointState(self.kuka_id, 11, 0.3)
+        p.resetJointState(self.kuka_id, 13, 0)
+
         p.stepSimulation()
         return self._resolve_obs_return()
 
@@ -314,7 +321,7 @@ class KukaGraspEnv(gym.Env):
 
 if __name__ == '__main__':
     # 这一部分是做baseline，即让机械臂随机选择动作，看看能够得到的分数
-    env = KukaGraspEnv()
+    env = KukaGripperReachEnv(is_good_view=True,is_render=True)
     print('env={}'.format(env))
     print(env.observation_space.shape)
     # print(env.observation_space.sample())

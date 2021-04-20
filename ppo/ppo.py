@@ -24,11 +24,13 @@ from spinup.utils.mpi_tools import mpi_fork, mpi_avg, proc_id, mpi_statistics_sc
 from env.kuka_reach_env import KukaReachEnv
 from ppo.logx import Logger
 import sys
-from colorama import Fore,Back,init
+from colorama import Fore, Back, init
+
 init(autoreset=True)
 
-IS_DEBUG=False
-ppo_logger=Logger(output_dir="../logs",is_debug=IS_DEBUG)
+IS_DEBUG = False
+ppo_logger = Logger(output_dir="../logs", is_debug=IS_DEBUG)
+
 
 class PPOBuffer:
     """
@@ -36,10 +38,11 @@ class PPOBuffer:
     with the environment, and using Generalized Advantage Estimation (GAE-Lambda)
     for calculating the advantages of state-action pairs.
     """
-
     def __init__(self, obs_dim, act_dim, size, gamma=0.99, lam=0.95):
-        self.obs_buf = np.zeros(core.combined_shape(size, obs_dim), dtype=np.float32)
-        self.act_buf = np.zeros(core.combined_shape(size, act_dim), dtype=np.float32)
+        self.obs_buf = np.zeros(core.combined_shape(size, obs_dim),
+                                dtype=np.float32)
+        self.act_buf = np.zeros(core.combined_shape(size, act_dim),
+                                dtype=np.float32)
         self.adv_buf = np.zeros(size, dtype=np.float32)
         self.rew_buf = np.zeros(size, dtype=np.float32)
         self.ret_buf = np.zeros(size, dtype=np.float32)
@@ -47,9 +50,6 @@ class PPOBuffer:
         self.logp_buf = np.zeros(size, dtype=np.float32)
         self.gamma, self.lam = gamma, lam
         self.ptr, self.path_start_idx, self.max_size = 0, 0, size
-
-
-
 
     def store(self, obs, act, rew, val, logp):
         """
@@ -85,7 +85,8 @@ class PPOBuffer:
 
         # the next two lines implement GAE-Lambda advantage calculation
         deltas = rews[:-1] + self.gamma * vals[1:] - vals[:-1]
-        self.adv_buf[path_slice] = core.discount_cumsum(deltas, self.gamma * self.lam)
+        self.adv_buf[path_slice] = core.discount_cumsum(
+            deltas, self.gamma * self.lam)
 
         # the next line computes rewards-to-go, to be targets for the value function
         self.ret_buf[path_slice] = core.discount_cumsum(rews, self.gamma)[:-1]
@@ -103,15 +104,34 @@ class PPOBuffer:
         # the next two lines implement the advantage normalization trick
         adv_mean, adv_std = mpi_statistics_scalar(self.adv_buf)
         self.adv_buf = (self.adv_buf - adv_mean) / adv_std
-        data = dict(obs=self.obs_buf, act=self.act_buf, ret=self.ret_buf,
-                    adv=self.adv_buf, logp=self.logp_buf)
-        return {k: torch.as_tensor(v, dtype=torch.float32) for k, v in data.items()}
+        data = dict(obs=self.obs_buf,
+                    act=self.act_buf,
+                    ret=self.ret_buf,
+                    adv=self.adv_buf,
+                    logp=self.logp_buf)
+        return {
+            k: torch.as_tensor(v, dtype=torch.float32)
+            for k, v in data.items()
+        }
 
 
-def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
-        steps_per_epoch=4000, epochs=50, gamma=0.99, clip_ratio=0.2, pi_lr=3e-4,
-        vf_lr=1e-3, train_pi_iters=80, train_v_iters=80, lam=0.97, max_ep_len=1000,
-        target_kl=0.01, logger_kwargs=dict(), save_freq=10):
+def ppo(env,
+        actor_critic=core.MLPActorCritic,
+        ac_kwargs=dict(),
+        seed=0,
+        steps_per_epoch=4000,
+        epochs=50,
+        gamma=0.99,
+        clip_ratio=0.2,
+        pi_lr=3e-4,
+        vf_lr=1e-3,
+        train_pi_iters=80,
+        train_v_iters=80,
+        lam=0.97,
+        max_ep_len=1000,
+        target_kl=0.01,
+        logger_kwargs=dict(),
+        save_freq=10):
     """
     Proximal Policy Optimization (by clipping),
 
@@ -231,16 +251,15 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
 
     # modified this to satisfy the custom env
     #env = env_fn()
-    env=env
+    env = env
     obs_dim = env.observation_space.shape
     act_dim = env.action_space.shape
 
     # Create actor-critic module
     ac = actor_critic(env.observation_space, env.action_space, **ac_kwargs)
-    ppo_logger.log("ac={}".format(ac),'green')
+    ppo_logger.log("ac={}".format(ac), 'green')
 
     print('ac={}'.format(ac))
-
     """
     ac=MLPActorCritic(
   (pi): MLPGaussianActor(
@@ -279,17 +298,20 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
 
     # Set up function for computing PPO policy loss
     def compute_loss_pi(data):
-        obs, act, adv, logp_old = data['obs'], data['act'], data['adv'], data['logp']
-        ppo_logger.log("obs={}\nact={}\nadv={}\nlogp_old={}".format(obs,act,adv,logp_old))
+        obs, act, adv, logp_old = data['obs'], data['act'], data['adv'], data[
+            'logp']
+        ppo_logger.log("obs={}\nact={}\nadv={}\nlogp_old={}".format(
+            obs, act, adv, logp_old))
 
         # Policy loss
         pi, logp = ac.pi(obs, act)
-        ppo_logger.log("pi={},logp={}".format(pi,logp))
+        ppo_logger.log("pi={},logp={}".format(pi, logp))
 
         ratio = torch.exp(logp - logp_old)
         clip_adv = torch.clamp(ratio, 1 - clip_ratio, 1 + clip_ratio) * adv
         loss_pi = -(torch.min(ratio * adv, clip_adv)).mean()
-        ppo_logger.log("ratio={},clip_adv={},loss_pi={}".format(ratio,clip_adv,loss_pi))
+        ppo_logger.log("ratio={},clip_adv={},loss_pi={}".format(
+            ratio, clip_adv, loss_pi))
 
         # Useful extra info
         approx_kl = (logp_old - logp).mean().item()
@@ -303,8 +325,9 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
     # Set up function for computing value loss
     def compute_loss_v(data):
         obs, ret = data['obs'], data['ret']
-        ppo_logger.log("obs={},ret={},loss_v={}".format(obs,ret,((ac.v(obs) - ret) ** 2).mean()))
-        return ((ac.v(obs) - ret) ** 2).mean()
+        ppo_logger.log("obs={},ret={},loss_v={}".format(
+            obs, ret, ((ac.v(obs) - ret)**2).mean()))
+        return ((ac.v(obs) - ret)**2).mean()
 
     # Set up optimizers for policy and value function
     pi_optimizer = Adam(ac.pi.parameters(), lr=pi_lr)
@@ -331,7 +354,8 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
 
             kl = mpi_avg(pi_info['kl'])
             if kl > 1.5 * target_kl:
-                logger.log('Early stopping at step %d due to reaching max kl.' % i)
+                logger.log(
+                    'Early stopping at step %d due to reaching max kl.' % i)
                 break
             loss_pi.backward()
             mpi_avg_grads(ac.pi)  # average grads across MPI processes
@@ -350,29 +374,32 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
 
         # Log changes from update
         kl, ent, cf = pi_info['kl'], pi_info_old['ent'], pi_info['cf']
-        logger.store(LossPi=pi_l_old, LossV=v_l_old,
-                     KL=kl, Entropy=ent, ClipFrac=cf,
+        logger.store(LossPi=pi_l_old,
+                     LossV=v_l_old,
+                     KL=kl,
+                     Entropy=ent,
+                     ClipFrac=cf,
                      DeltaLossPi=(loss_pi.item() - pi_l_old),
                      DeltaLossV=(loss_v.item() - v_l_old))
 
     # Prepare for interaction with environment
     start_time = time.time()
     o, ep_ret, ep_len = env.reset(), 0, 0
-   # ppo_logger.log("o={},ep_ret={},ep_len={}".format(o,ep_ret,ep_len))
+    # ppo_logger.log("o={},ep_ret={},ep_len={}".format(o,ep_ret,ep_len))
 
     # Main loop: collect experience in env and update/log each epoch
     for epoch in range(epochs):
         for t in range(local_steps_per_epoch):
             a, v, logp = ac.step(torch.as_tensor(o, dtype=torch.float32))
-          #  ppo_logger.log("a={},v={},logp={}".format(a,v,logp))
+            #  ppo_logger.log("a={},v={},logp={}".format(a,v,logp))
 
-           # print('a={}'.format(a))
+            # print('a={}'.format(a))
             next_o, r, d, _ = env.step(a)
             ep_ret += r
             ep_len += 1
 
             # save and log
-           # print(Back.RED+'o={},\na={},\nr={},\nv={},\nlogp={}'.format(o,a,r,v,logp))
+            # print(Back.RED+'o={},\na={},\nr={},\nv={},\nlogp={}'.format(o,a,r,v,logp))
             buf.store(o, a, r, v, logp)
             logger.store(VVals=v)
 
@@ -385,7 +412,9 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
 
             if terminal or epoch_ended:
                 if epoch_ended and not (terminal):
-                    print('Warning: trajectory cut off by epoch at %d steps.' % ep_len, flush=True)
+                    print('Warning: trajectory cut off by epoch at %d steps.' %
+                          ep_len,
+                          flush=True)
                 # if trajectory didn't reach terminal state, bootstrap value target
                 if timeout or epoch_ended:
                     _, v, _ = ac.step(torch.as_tensor(o, dtype=torch.float32))
@@ -424,12 +453,12 @@ def ppo(env, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
 
 if __name__ == '__main__':
 
-    env=KukaReachEnv(is_render=True,is_good_view=True)
+    env = KukaReachEnv(is_render=True, is_good_view=True)
 
     import argparse
 
     parser = argparse.ArgumentParser()
-   # parser.add_argument('--env', type=str, default='HalfCheetah-v2')
+    # parser.add_argument('--env', type=str, default='HalfCheetah-v2')
 
     #modified this to satisfy the custom env
     parser.add_argument('--env', type=str, default=env)
@@ -449,13 +478,15 @@ if __name__ == '__main__':
 
     from spinup.utils.run_utils import setup_logger_kwargs
 
-    logger_kwargs = setup_logger_kwargs(args.exp_name, args.seed,data_dir=args.log_dir)
+    logger_kwargs = setup_logger_kwargs(args.exp_name,
+                                        args.seed,
+                                        data_dir=args.log_dir)
 
     ppo(env,
         actor_critic=core.MLPActorCritic,
         ac_kwargs=dict(hidden_sizes=[args.hid] * args.l),
         gamma=args.gamma,
         seed=args.seed,
-        steps_per_epoch=env.max_steps_one_episode*args.cpu,
+        steps_per_epoch=env.max_steps_one_episode * args.cpu,
         epochs=100,
         logger_kwargs=logger_kwargs)

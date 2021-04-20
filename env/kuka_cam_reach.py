@@ -3,7 +3,7 @@
 '''
 @File    :   kuka_reach_env.py
 @Time    :   2021/03/20 14:33:24
-@Author  :   Yan Wen 
+@Author  :   Yan Wen
 @Version :   1.0
 @Contact :   z19040042@s.upc.edu.cn
 @License :   (C)Copyright 2021-2022, Liugroup-NLPR-CASIA
@@ -316,11 +316,6 @@ class KukaCamReachEnv(gym.Env):
         # self.processed_image=self.resize(image).to(self.device)
         # return self.processed_image
 
-    # if you want to view the processed image, call this function at somewhere.
-    def _view_processed_image(self, image):
-        plt.imshow(image.cpu().squeeze(0).permute(1, 2, 0).numpy(),
-                   interpolation='none')
-        plt.show()
 
     def step(self, action):
         dv = 0.005

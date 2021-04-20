@@ -6,7 +6,6 @@
 @Author  :   Yan Wen 
 @Version :   1.0
 @Contact :   z19040042@s.upc.edu.cn
-@License :   (C)Copyright 2021-2022, Liugroup-NLPR-CASIA
 @Desc    :   None
 '''
 
