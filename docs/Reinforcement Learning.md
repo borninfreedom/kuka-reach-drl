@@ -22,3 +22,10 @@
 
 * MG Bellemare, Y Naddaf, J Veness, and M Bowling. "The arcade learning environment: An evaluation platform for general agents." Journal of Artificial Intelligence Research (2012). https://github.com/mgbellemare/Arcade-Learning-Environment
 * Stella: A Multi-Platform Atari 2600 VCS emulator https://stella-emu.github.io/
+* [IMPALA: Scalable Distributed Deep-RL with Importance Weighted Actor-Learner Architectures](http://arxiv.org/abs/1802.01561c)
+* PyBullet Quickstart Guide
+* [Dueling Network Architectures for Deep Reinforcement Learning](http://arxiv.org/abs/1511.06581)
+* [Hindsight Experience Replay](http://arxiv.org/abs/1707.01495)
+* [Prioritized Experience Replay](http://arxiv.org/abs/1511.05952)
+* [Proximal Policy Optimization Algorithms](http://arxiv.org/abs/1707.06347)
+* [Overcoming Exploration in Reinforcement Learning with Demonstrations](http://arxiv.org/abs/1709.10089)
