@@ -2,6 +2,7 @@
 Train kuka robot reach a point with deep rl in pybullet.
 
 * **NOTE: The main brach is trained with spinup, and there are some issues with gpu and multi core CPUs at the same time, so this brach will be deprecated in the future. The rllib branch is trained with ray/rllib, and this branch will be mainly used in the future.**
+* **The main branch will not update for a while, the rllib brach is the newest**
 
 
 The train process with mlp|The evaluate process with mlp|train plot
