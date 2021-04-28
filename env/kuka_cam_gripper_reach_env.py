@@ -52,7 +52,7 @@ class KukaCamGripperReachEnv(gym.Env):
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 50
     }
-    max_steps_one_episode = 512
+    max_steps_one_episode = 200
 
     def __init__(self, is_render=False, is_good_view=False):
 
