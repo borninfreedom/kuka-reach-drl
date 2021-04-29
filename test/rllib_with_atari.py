@@ -11,14 +11,14 @@ config = {
     'framework':'torch',
     'render_env':False,
     'num_gpus_per_worker':0,
-    'num_envs_per_worker':2,
+    'num_envs_per_worker':1,
 }
 stop = {
     'episode_reward_mean': 500
 }
 st=time.time()
 results = tune.run(
-    'PPO', # Specify the algorithm to train
+    'IMPALA', # Specify the algorithm to train
     config=config,
     stop=stop
 )
