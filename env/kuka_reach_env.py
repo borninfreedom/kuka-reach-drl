@@ -6,7 +6,6 @@
 @Author  :   Yan Wen 
 @Version :   1.0
 @Contact :   z19040042@s.upc.edu.cn
-@License :   (C)Copyright 2021-2022, Liugroup-NLPR-CASIA
 @Desc    :   None
 '''
 
@@ -26,42 +25,33 @@ import time
 from numpy import arange
 import logging
 import math
-from termcolor import colored
 
-#### 一些变量 ######
-LOGGING_LEVEL = logging.INFO
-# is_render=False
-# is_good_view=False   #这个的作用是在step时加上time.sleep()，把机械比的动作放慢，看的更清，但是会降低训练速度
-#########################
+import ray
+from ray import tune
+from ray.tune import grid_search
+from ray.rllib.env.env_context import EnvContext
+from ray.rllib.models import ModelCatalog
+from ray.rllib.models.tf.tf_modelv2 import TFModelV2
+from ray.rllib.models.tf.fcnet import FullyConnectedNetwork
+from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
+from ray.rllib.models.torch.fcnet import FullyConnectedNetwork as TorchFC
+from ray.rllib.utils.framework import try_import_tf, try_import_torch
+from ray.rllib.utils.test_utils import check_learning_achieved
 
-# logging.basicConfig(
-#     level=LOGGING_LEVEL,
-#     format='%(asctime)s - %(threadName)s - %(pathname)s[line:%(lineno)d] - %(levelname)s: %(message)s',
-#     filename='../logs/reach_env.log'.format(time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())),
-#     filemode='w')
-# logger = logging.getLogger(__name__)
-# env_logger=logging.getLogger('env.py')
-
-# logging模块的使用
-# 级别                何时使用
-# DEBUG       细节信息，仅当诊断问题时适用。
-# INFO        确认程序按预期运行
-# WARNING     表明有已经或即将发生的意外（例如：磁盘空间不足）。程序仍按预期进行
-# ERROR       由于严重的问题，程序的某些功能已经不能正常执行
-# CRITICAL    严重的错误，表明程序已不能继续执行
-
+tf1, tf, tfv = try_import_tf()
+torch, nn = try_import_torch()
 
 class KukaReachEnv(gym.Env):
     metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 50
     }
-    max_steps_one_episode = 1000
 
-    def __init__(self, is_render=False, is_good_view=False):
+    def __init__(self, config:EnvContext):
 
-        self.is_render = is_render
-        self.is_good_view = is_good_view
+        self.max_steps_one_episode=if config["max_steps_one_episode"] else 1000
+        self.is_render = if config["is_render"] else False
+        self.is_good_view = if config["is_good_view"] else False
 
         if self.is_render:
             p.connect(p.GUI)
@@ -123,12 +113,11 @@ class KukaReachEnv(gym.Env):
         self.orientation = p.getQuaternionFromEuler(
             [0., -math.pi, math.pi / 2.])
 
-        self.seed()
+        self.seed(config.worker_index*config.num_workers)
         self.reset()
 
     def seed(self, seed=None):
-        self.np_random, seed = seeding.np_random(seed)
-        return [seed]
+        random.seed(seed)
 
     def reset(self):
         #p.connect(p.GUI)
@@ -198,6 +187,7 @@ class KukaReachEnv(gym.Env):
         #logging.debug("init_pos={}\n".format(p.getLinkState(self.kuka_id,self.num_joints-1)))
         p.stepSimulation()
         self.object_pos = p.getBasePositionAndOrientation(self.object_id)[0]
+        self.robot_pos=p.getLinkState(self.kuka_id,self.num_joints-1)
         return np.array(self.object_pos).astype(np.float32)
         #return np.array(self.robot_pos_obs).astype(np.float32)
 
