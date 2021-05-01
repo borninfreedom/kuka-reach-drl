@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find dianaS1_description)/urdf/Diana.transmission.xacro" />
+  <xacro:include filename="$(find dianaS1_description)/urdf/Diana.gazebo.xacro" />
+
+
+  <xacro:macro name="DianaS1_robot" params="prefix joint_limited
+    joint1_limitL:=${-179.0/180.0*pi}  joint1_limitU:=${179.0/180.0*pi}
+    joint2_limitL:=${-160.0/180.0*pi}    joint2_limitU:=${160.0/180.0*pi}
+    joint3_limitL:=${-179.0/180.0*pi}    joint3_limitU:=${179.0/180.0*pi}
+    joint4_limitL:=${-160.0/180.0*pi}    joint4_limitU:=${160.0/180.0*pi}
+    joint5_limitL:=${-179.0/180.0*pi}  joint5_limitU:=${179.0/180.0*pi}
+    joint6_limitL:=${-179.0/180.0*pi}    joint6_limitU:=${179.0/180.0*pi}
+    joint7_limitL:=${-179.0/180.0*pi}    joint7_limitU:=${179.0/180.0*pi}
+    transmission_hw_interface:=hardware_interface/PositionJointInterface
+    safety_limits:=false safety_pos_margin:=0.15
+    safety_k_position:=20 safety_k_velocity:=0.0">
+
+    <!-- Kinematic model -->
+    <xacro:property name="d1" value="-0.27230" />
+    <xacro:property name="d2" value="-0.15600" />
+    <xacro:property name="d3" value="-0.45770" />
+    <xacro:property name="d4" value="-0.13710" />
+    <xacro:property name="d5" value="-0.44900" />
+    <xacro:property name="d6" value="-0.13650" />
+    <xacro:property name="d7" value="-0.08250" />
+
+    <xacro:property name="a1" value="0.00000" />
+    <xacro:property name="a2" value="0.00000" />
+    <xacro:property name="a3" value="0.00000" />
+    <xacro:property name="a4" value="0.00000" />
+    <xacro:property name="a5" value="0.00000" />
+    <xacro:property name="a6" value="0.00000" />
+    <xacro:property name="a7" value="0.00000" />
+
+    <xacro:property name="alpha1" value="${pi}" />
+    <xacro:property name="alpha2" value="${-0.5*pi}" />
+    <xacro:property name="alpha3" value="${0.5*pi}" />
+    <xacro:property name="alpha4" value="${0.5*pi}" />
+    <xacro:property name="alpha5" value="${-0.5*pi}" />
+    <xacro:property name="alpha6" value="${-0.5*pi}" />
+    <xacro:property name="alpha7" value="${0.5*pi}" />
+
+    <xacro:property name="joint_effort" value="150.0" />    
+    <xacro:property name="joint_vel" value="${pi}" />
+    <xacro:property name="joint_damp" value="0.0" />
+    <xacro:property name="joint_frict" value="0.0" />
+
+
+
+
+
+    <link name="${prefix}base_link">
+      <inertial>
+        <origin xyz="-0.00025974 -0.00026507 0.024973" rpy="0 0 0" />
+        <mass value="1.61" />
+        <inertia
+          ixx="0.0042468"
+          ixy="2.2962E-05"
+          ixz="-7.5575E-06"
+          iyy="0.004245"
+          iyz="-7.4546E-06"
+          izz="0.0072668" />
+      </inertial>
+      <visual>
+        <origin yz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://dianaS1_description/meshes/base_link.STL" />
+        </geometry>
+        <material name="LightGrey">
+          <color rgba="0.7 0.7 0.7 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://dianaS1_description/meshes/base_link.STL" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}joint1" type="revolute">
+      <origin xyz="0 0 ${-d1}" rpy="${alpha1} 0 0" />
+      <parent link="${prefix}base_link" />
+      <child link="${prefix}link1" />
+      <axis xyz="0 0 1" />
+      <limit lower="${joint1_limitL}" upper="${joint1_limitU}" effort="235.0" velocity="${joint_vel}" />
+      <xacro:if value="${safety_limits}">
+        <safety_controller soft_lower_limit="${joint1_limitL + safety_pos_margin}" soft_upper_limit="${joint1_limitU - safety_pos_margin}"
+          k_position="${safety_k_position}" k_velocity="${safety_k_velocity}"/>
+      </xacro:if>
+      <dynamics damping="${joint_damp}" friction="${joint_frict}"/>
+    </joint>  
+    <link name="${prefix}link1">
+      <inertial>
+        <origin xyz="-0.000108043 -0.044600027 0.068607373" rpy="0 0 0" />
+        <mass value="6.67548" />
+        <inertia
+          ixx="0.113166041"
+          ixy="-0.00000662439"
+          ixz="0.0000384752"
+          iyy="0.085738172"
+          iyz="-0.0000471067"
+          izz="0.04163282" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://dianaS1_description/meshes/link1.STL" />
+        </geometry>
+        <material name="LightGrey">
+          <color rgba="0.7 0.7 0.7 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://dianaS1_description/meshes/link1.STL" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}joint2" type="revolute">
+      <origin xyz="0 ${d2} 0" rpy="${alpha2} 0 0" />
+      <parent link="${prefix}link1" />
+      <child link="${prefix}link2" />
+      <axis xyz="0 0 1" />
+      <limit lower="${joint2_limitL}" upper="${joint2_limitU}" effort="235.0" velocity="${joint_vel}" />
+      <xacro:if value="${safety_limits}">
+        <safety_controller soft_lower_limit="${joint2_limitL + safety_pos_margin}" soft_upper_limit="${joint2_limitU - safety_pos_margin}"
+          k_position="${safety_k_position}" k_velocity="${safety_k_velocity}"/>
+      </xacro:if>
+      <dynamics damping="${joint_damp}" friction="${joint_frict}"/>
+    </joint>
+    <link name="${prefix}link2">
+      <inertial>
+        <origin xyz="0.00000875698 0.047132796 0.006996823" rpy="0 0 0" />
+        <mass value="3.11643" />
+        <inertia
+          ixx="0.021414698"
+          ixy="-0.0000012365"
+          ixz="0.00000085133"
+          iyy="0.006006288"
+          iyz="0.000151513"
+          izz="0.022441273" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://dianaS1_description/meshes/link2.STL" />
+        </geometry>
+        <material name="LightGrey">
+          <color rgba="0.7 0.7 0.7 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://dianaS1_description/meshes/link2.STL" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}joint3" type="revolute">
+      <origin xyz="0 ${-d3} 0" rpy="${alpha3} 0 0" />
+      <parent link="${prefix}link2" />
+      <child link="${prefix}link3" />
+      <axis xyz="0 0 1" />
+      <limit lower="${joint3_limitL}" upper="${joint3_limitU}" effort="111.0" velocity="${joint_vel}" />
+      <xacro:if value="${safety_limits}">
+        <safety_controller soft_lower_limit="${joint3_limitL + safety_pos_margin}" soft_upper_limit="${joint3_limitU - safety_pos_margin}"
+          k_position="${safety_k_position}" k_velocity="${safety_k_velocity}"/>
+      </xacro:if>
+      <dynamics damping="${joint_damp}" friction="${joint_frict}"/>
+    </joint>
+    <link name="${prefix}link3">
+      <inertial>
+        <origin xyz="0.0000183253 0.03187396 0.136688085" rpy="0 0 0" />
+        <mass value="4.62614" />
+        <inertia
+          ixx="0.198692057"
+          ixy="0.00000537943"
+          ixz="0.0000108296"
+          iyy="0.187330776"
+          iyz="-0.00026749"
+          izz="0.018225492" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://dianaS1_description/meshes/link3.STL" />
+        </geometry>
+        <material name="LightGrey">
+          <color rgba="0.7 0.7 0.7 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://dianaS1_description/meshes/link3.STL" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}joint4" type="revolute">
+      <origin xyz="0 ${-d4} 0" rpy="${alpha4} 0 0" />
+      <parent link="${prefix}link3" />
+      <child link="${prefix}link4" />
+      <axis xyz="0 0 1" />
+      <limit lower="${joint4_limitL}" upper="${joint4_limitU}" effort="111.0" velocity="${joint_vel}" />
+      <xacro:if value="${safety_limits}">
+        <safety_controller soft_lower_limit="${joint4_limitL + safety_pos_margin}" soft_upper_limit="${joint4_limitU - safety_pos_margin}"
+          k_position="${safety_k_position}" k_velocity="${safety_k_velocity}"/>
+      </xacro:if>
+      <dynamics damping="${joint_damp}" friction="${joint_frict}"/>
+    </joint>
+    <link name="${prefix}link4">
+      <inertial>
+        <origin xyz="-0.0000171058 -0.048491536 0.007150206" rpy="0 0 0" />
+        <mass value="1.9961" />
+        <inertia
+          ixx="0.012642755"
+          ixy="-0.00000163658"
+          ixz="0.00000012834"
+          iyy="0.002906848"
+          iyz="-0.0000516913"
+          izz="0.012740515" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://dianaS1_description/meshes/link4.STL" />
+        </geometry>
+        <material name="LightGrey">
+          <color rgba="0.7 0.7 0.7 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://dianaS1_description/meshes/link4.STL" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}joint5" type="revolute">
+      <origin xyz="0 ${d5} 0" rpy="${alpha5} 0 0" />
+      <parent link="${prefix}link4" />
+      <child link="${prefix}link5" />
+      <axis xyz="0 0 1" />
+      <limit lower="${joint5_limitL}" upper="${joint5_limitU}" effort="90.0" velocity="${joint_vel}" />
+      <xacro:if value="${safety_limits}">
+        <safety_controller soft_lower_limit="${joint5_limitL + safety_pos_margin}" soft_upper_limit="${joint5_limitU - safety_pos_margin}"
+          k_position="${safety_k_position}" k_velocity="${safety_k_velocity}"/>
+      </xacro:if>
+      <dynamics damping="${joint_damp}" friction="${joint_frict}"/>
+    </joint>
+    <link name="${prefix}link5">
+      <inertial>
+        <origin xyz="-0.000027456 -0.002120073 0.13041583" rpy="0 0 0" />
+        <mass value="3.40632" />
+        <inertia
+          ixx="0.129484072"
+          ixy="0.00000023257"
+          ixz="0.00000830368"
+          iyy="0.128743236"
+          iyz="-0.0000756544"
+          izz="0.004813837" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://dianaS1_description/meshes/link5.STL" />
+        </geometry>
+        <material name="LightGrey">
+          <color rgba="0.7 0.7 0.7 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://dianaS1_description/meshes/link5.STL" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}joint6" type="revolute">
+      <origin xyz="0 ${d6} 0" rpy="${alpha6} 0 0" />
+      <parent link="${prefix}link5" />
+      <child link="${prefix}link6" />
+      <axis xyz="0 0 1" />
+      <limit lower="${joint6_limitL}" upper="${joint6_limitU}" effort="90.0" velocity="${joint_vel}" />
+      <xacro:if value="${safety_limits}">
+        <safety_controller soft_lower_limit="${joint6_limitL + safety_pos_margin}" soft_upper_limit="${joint6_limitU - safety_pos_margin}"
+          k_position="${safety_k_position}" k_velocity="${safety_k_velocity}"/>
+      </xacro:if>
+      <dynamics damping="${joint_damp}" friction="${joint_frict}"/>
+    </joint>
+    <link name="${prefix}link6">
+      <inertial>
+        <origin xyz="0.0000262506 0.003206123 0.027090603" rpy="0 0 0" />
+        <mass value="2.31124" />
+        <inertia
+          ixx="0.008348207"
+          ixy="-0.00000063196"
+          ixz="-0.0000036489"
+          iyy="0.007600004"
+          iyz="0.0000308886"
+          izz="0.003426032" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://dianaS1_description/meshes/link6.STL" />
+        </geometry>
+        <material name="LightGrey">
+          <color rgba="0.7 0.7 0.7 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://dianaS1_description/meshes/link6.STL" />
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}joint7" type="revolute">
+      <origin xyz="0 ${-d7} 0" rpy="${alpha7} 0 0" />
+      <parent link="${prefix}link6" />
+      <child link="${prefix}link7" />
+      <axis xyz="0 0 1" />
+      <limit lower="${joint7_limitL}" upper="${joint7_limitU}" effort="90.0" velocity="${joint_vel}" />
+      <xacro:if value="${safety_limits}">
+        <safety_controller soft_lower_limit="${joint7_limitL + safety_pos_margin}" soft_upper_limit="${joint7_limitU - safety_pos_margin}"
+          k_position="${safety_k_position}" k_velocity="${safety_k_velocity}"/>
+      </xacro:if>
+      <dynamics damping="${joint_damp}" friction="${joint_frict}"/>
+    </joint>
+    <link name="${prefix}link7">
+      <inertial>
+        <origin xyz="0.0 0.0001 0.03405" rpy="0 0 0" />
+        <mass value="0.53497" />
+        <inertia
+          ixx="0.001391424"
+          ixy="-0.0000002188"
+          ixz="0.00000014776"
+          iyy="0.001391382"
+          iyz="-0.00000139675"
+          izz="0.000430176" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://dianaS1_description/meshes/link7.STL" />
+        </geometry>
+        <material name="LightGrey">
+          <color rgba="0.7 0.7 0.7 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://dianaS1_description/meshes/link7.STL" />
+        </geometry>
+      </collision>
+    </link>
+
+    <xacro:Diana_arm_transmission prefix="${prefix}" hw_interface="${transmission_hw_interface}" />
+    <xacro:Diana_arm_gazebo prefix="${prefix}" />
+
+  </xacro:macro>
+</robot>

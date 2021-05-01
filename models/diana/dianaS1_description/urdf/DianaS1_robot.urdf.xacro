@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="DianaS1" >
+
+  <xacro:arg name="transmission_hw_interface" default="hardware_interface/PositionJointInterface"/>
+
+  <!-- common stuff -->
+  <xacro:include filename="$(find dianaS1_description)/urdf/common.gazebo.xacro" />
+
+  <!-- DianaS1 -->
+  <xacro:include filename="$(find dianaS1_description)/urdf/DianaS1.urdf.xacro" />
+
+  <!-- arm -->
+  <xacro:DianaS1_robot prefix="" joint_limited="false" 
+    transmission_hw_interface="$(arg transmission_hw_interface)"
+  />
+
+  <link name="world" />
+
+  <joint name="world_joint" type="fixed">
+    <parent link="world" />
+    <child link = "base_link" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+  </joint>
+
+</robot>
