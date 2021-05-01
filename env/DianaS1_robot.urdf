@@ -225,8 +225,8 @@
       <geometry>
         <mesh filename="package://dianaS1_description/meshes/link7.STL"/>
       </geometry>
-      <material name="Black">
-        <color rgba="0. 0. 0. 1"/>
+      <material name="LightGrey">
+        <color rgba="0.7 0.7 0.7 1"/>
       </material>
     </visual>
     <collision>

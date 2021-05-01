@@ -7,7 +7,7 @@ from colorama import Fore,Back,init
 init(autoreset=True)
 p.connect(p.GUI)
 p.setGravity(0, 0, -10)
-p.setAdditionalSearchPath(pybullet_data.getDataPath())
+p.setAdditionalSearchPath('../models/')
 
 x_low_obs = 0.2
 x_high_obs = 0.7
@@ -36,7 +36,8 @@ joint_damping = [
     0.00001, 0.00001, 0.00001, 0.00001, 0.00001, 0.00001, 0.00001
 ]
 p.loadURDF("plane.urdf", basePosition=[0, 0, -0.65])
-kuka_id = p.loadSDF("kuka_iiwa/kuka_with_gripper2.sdf")[0]
+#kuka_id = p.loadSDF("kuka_iiwa/kuka_with_gripper2.sdf")[0]
+kuka_id = p.loadURDF("diana/,useFixedBase=True)
 object_orn=p.getQuaternionFromEuler([0,0,math.pi/2])
 p.loadURDF("table/table.urdf", basePosition=[0.5, 0, -0.65])
 # p.loadURDF(os.path.join(urdf_root_path, "tray/traybox.urdf"),basePosition=[0.55,0,0])

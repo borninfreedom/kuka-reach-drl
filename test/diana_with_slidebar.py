@@ -44,7 +44,7 @@ z_high_action = 0.3
 
 p.connect(p.GUI)
 p.setGravity(0, 0, -10)
-
+p.setAdditionalSearchPath('../models/')
 p.configureDebugVisualizer(lightPosition=[5, 0, 5])
 p.resetDebugVisualizerCamera(cameraDistance=1.5,
                              cameraYaw=0,
@@ -69,9 +69,9 @@ init_joint_positions = [
 
 orientation = p.getQuaternionFromEuler([0., -math.pi, math.pi / 2.])
 
-p.setAdditionalSearchPath(pybullet_data.getDataPath())
+#p.setAdditionalSearchPath(pybullet_data.getDataPath())
 #kuka_uid = p.loadSDF("kuka_iiwa/kuka_with_gripper2.sdf")[0]
-kuka_uid = p.loadURDF("DianaS1_robot.urdf")
+kuka_uid = p.loadURDF("diana/DianaS1_robot.urdf",useFixedBase=True)
 num_joints = p.getNumJoints(kuka_uid)
 print('num_joints={}'.format(num_joints))
 
