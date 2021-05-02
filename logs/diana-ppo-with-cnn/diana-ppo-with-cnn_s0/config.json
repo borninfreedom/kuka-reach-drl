@@ -1,0 +1,276 @@
+{
+    "ac_kwargs":	{
+        "hidden_sizes":	[
+            64,
+            64
+        ]
+    },
+    "actor_critic":	"CNNActorCritic",
+    "clip_ratio":	0.2,
+    "env_fn":	{
+        "<CustomSkipFrame<KukaCamReachEnv instance>>":	{
+            "action_space":	{
+                "Box(3,)":	{
+                    "bounded_above":	"[ True  True  True]",
+                    "bounded_below":	"[ True  True  True]",
+                    "dtype":	"float32",
+                    "high":	"[0.4 0.4 0.3]",
+                    "low":	"[-0.4 -0.4 -0.6]",
+                    "np_random":	"RandomState(MT19937)",
+                    "shape":	[
+                        3
+                    ]
+                }
+            },
+            "env":	{
+                "<KukaCamReachEnv instance>":	{
+                    "action_space":	{
+                        "Box(3,)":	{
+                            "bounded_above":	"[ True  True  True]",
+                            "bounded_below":	"[ True  True  True]",
+                            "dtype":	"float32",
+                            "high":	"[0.4 0.4 0.3]",
+                            "low":	"[-0.4 -0.4 -0.6]",
+                            "np_random":	"RandomState(MT19937)",
+                            "shape":	[
+                                3
+                            ]
+                        }
+                    },
+                    "camera_parameters":	{
+                        "camera_up_vector":	[
+                            1,
+                            0,
+                            0
+                        ],
+                        "eye_position":	[
+                            0.59,
+                            0,
+                            0.8
+                        ],
+                        "far":	100.0,
+                        "fov":	60,
+                        "height":	720,
+                        "light_direction":	[
+                            0.5,
+                            0,
+                            1
+                        ],
+                        "near":	0.1,
+                        "target_position":	[
+                            0.55,
+                            0,
+                            0.05
+                        ],
+                        "width":	960.0
+                    },
+                    "device":	"cpu",
+                    "images":	"[[[106 106 106]\n  [106 106 106]\n  [106 106 106]\n  ...\n  [239 239 239]\n  [239 239 239]\n  [239 239 239]]\n\n [[106 106 106]\n  [106 106 106]\n  [106 106 106]\n  ...\n  [239 239 239]\n  [239 239 239]\n  [239 239 239]]\n\n [[106 106 106]\n  [106 106 106]\n  [106 106 106]\n  ...\n  [239 239 239]\n  [239 239 239]\n  [239 239 239]]\n\n ...\n\n [[223 205 177]\n  [224 205 177]\n  [223 204 176]\n  ...\n  [172 143 115]\n  [171 142 115]\n  [170 140 113]]\n\n [[223 204 177]\n  [224 204 177]\n  [224 204 177]\n  ...\n  [172 143 114]\n  [171 141 111]\n  [171 141 112]]\n\n [[224 204 177]\n  [224 204 177]\n  [224 204 177]\n  ...\n  [172 143 114]\n  [171 141 111]\n  [171 141 112]]]",
+                    "init_joint_positions":	[
+                        0.006418,
+                        0.413184,
+                        -0.011401,
+                        -1.589317,
+                        0.005379,
+                        1.137684,
+                        -0.006539
+                    ],
+                    "is_good_view":	false,
+                    "is_render":	false,
+                    "joint_damping":	[
+                        1e-05,
+                        1e-05,
+                        1e-05,
+                        1e-05,
+                        1e-05,
+                        1e-05,
+                        1e-05
+                    ],
+                    "joint_ranges":	[
+                        5.8,
+                        4,
+                        5.8,
+                        4,
+                        5.8,
+                        4,
+                        6
+                    ],
+                    "kuka_id":	1,
+                    "lower_limits":	[
+                        -0.967,
+                        -2,
+                        -2.96,
+                        0.19,
+                        -2.96,
+                        -2.09,
+                        -3.05
+                    ],
+                    "np_random":	"RandomState(MT19937)",
+                    "num_joints":	8,
+                    "object_id":	3,
+                    "object_pos":	[
+                        0.3522620424472975,
+                        0.2949994057845215,
+                        0.00982638888888889
+                    ],
+                    "observation_space":	{
+                        "Box(1, 84, 84)":	{
+                            "bounded_above":	"[[[ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  ...\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]]]",
+                            "bounded_below":	"[[[ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  ...\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]]]",
+                            "dtype":	"float32",
+                            "high":	"[[[1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]\n  ...\n  [1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]]]",
+                            "low":	"[[[0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]\n  ...\n  [0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]]]",
+                            "np_random":	"RandomState(MT19937)",
+                            "shape":	[
+                                1,
+                                84,
+                                84
+                            ]
+                        }
+                    },
+                    "orientation":	[
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "projection_matrix":	[
+                        1.299038052558899,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.7320507764816284,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        -1.0020020008087158,
+                        -1.0,
+                        0.0,
+                        0.0,
+                        -0.20020020008087158,
+                        0.0
+                    ],
+                    "rest_poses":	[
+                        0,
+                        0,
+                        0,
+                        1.5707963267948966,
+                        0,
+                        -1.0367255756846319,
+                        0
+                    ],
+                    "robot_pos_obs":	[
+                        0.5910012125968933,
+                        -0.1540999412536621,
+                        0.42179417610168457
+                    ],
+                    "step_counter":	0,
+                    "terminated":	false,
+                    "upper_limits":	[
+                        0.967,
+                        2,
+                        2.96,
+                        2.29,
+                        2.96,
+                        2.09,
+                        3.05
+                    ],
+                    "urdf_root_path":	"/home/dell/miniconda3/envs/spinningup/lib/python3.6/site-packages/pybullet_data",
+                    "view_matrix":	[
+                        -4.077196891216772e-08,
+                        -0.9396926164627075,
+                        0.3420202136039734,
+                        0.0,
+                        1.0,
+                        1.7763568394002505e-14,
+                        1.1920928244535389e-07,
+                        0.0,
+                        -1.1202008920463413e-07,
+                        0.3420202136039734,
+                        0.9396926164627075,
+                        0.0,
+                        2.8025592513358788e-08,
+                        0.4997299313545227,
+                        -0.9350957870483398,
+                        1.0
+                    ],
+                    "x_high_action":	0.4,
+                    "x_high_obs":	0.7999999999999999,
+                    "x_low_action":	-0.4,
+                    "x_low_obs":	0.30000000000000004,
+                    "y_high_action":	0.4,
+                    "y_high_obs":	0.3,
+                    "y_low_action":	-0.4,
+                    "y_low_obs":	-0.3,
+                    "z_high_action":	0.3,
+                    "z_high_obs":	0.55,
+                    "z_low_action":	-0.6,
+                    "z_low_obs":	0
+                }
+            },
+            "metadata":	{
+                "render.modes":	[
+                    "human",
+                    "rgb_array"
+                ],
+                "video.frames_per_second":	50
+            },
+            "observation_space":	{
+                "Box(4, 84, 84)":	{
+                    "bounded_above":	"[[[ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  ...\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]]\n\n [[ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  ...\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]]\n\n [[ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  ...\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]]\n\n [[ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  ...\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]]]",
+                    "bounded_below":	"[[[ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  ...\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]]\n\n [[ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  ...\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]]\n\n [[ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  ...\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]]\n\n [[ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  ...\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]\n  [ True  True  True ...  True  True  True]]]",
+                    "dtype":	"float32",
+                    "high":	"[[[1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]\n  ...\n  [1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]]\n\n [[1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]\n  ...\n  [1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]]\n\n [[1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]\n  ...\n  [1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]]\n\n [[1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]\n  ...\n  [1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]\n  [1. 1. 1. ... 1. 1. 1.]]]",
+                    "low":	"[[[0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]\n  ...\n  [0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]]\n\n [[0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]\n  ...\n  [0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]]\n\n [[0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]\n  ...\n  [0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]]\n\n [[0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]\n  ...\n  [0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]\n  [0. 0. 0. ... 0. 0. 0.]]]",
+                    "np_random":	"RandomState(MT19937)",
+                    "shape":	[
+                        4,
+                        84,
+                        84
+                    ]
+                }
+            },
+            "reward_range":	[
+                -Infinity,
+                Infinity
+            ],
+            "skip":	4
+        }
+    },
+    "epochs":	500,
+    "exp_name":	"diana-ppo-with-cnn",
+    "gamma":	0.99,
+    "lam":	0.97,
+    "logger":	{
+        "<ppo.logx.EpochLogger object at 0x7f76e82e1ba8>":	{
+            "epoch_dict":	{},
+            "exp_name":	"diana-ppo-with-cnn",
+            "first_row":	true,
+            "is_debug":	true,
+            "log_current_row":	{},
+            "log_headers":	[],
+            "output_dir":	"../../logs/diana-ppo-with-cnn/diana-ppo-with-cnn_s0",
+            "output_file":	{
+                "<_io.TextIOWrapper name='../../logs/diana-ppo-with-cnn/diana-ppo-with-cnn_s0/progress.txt' mode='w' encoding='UTF-8'>":	{
+                    "mode":	"w"
+                }
+            }
+        }
+    },
+    "logger_kwargs":	{
+        "exp_name":	"diana-ppo-with-cnn",
+        "output_dir":	"../../logs/diana-ppo-with-cnn/diana-ppo-with-cnn_s0"
+    },
+    "max_ep_len":	1000,
+    "pi_lr":	0.0003,
+    "pretrain":	null,
+    "save_freq":	10,
+    "seed":	0,
+    "steps_per_epoch":	10000,
+    "target_kl":	0.01,
+    "train_pi_iters":	80,
+    "train_v_iters":	80,
+    "vf_lr":	0.001
+}

@@ -1,0 +1,157 @@
+{
+    "ac_kwargs":	{
+        "hidden_sizes":	[
+            64,
+            64
+        ]
+    },
+    "actor_critic":	"MLPActorCritic",
+    "clip_ratio":	0.2,
+    "env":	{
+        "<KukaReachEnv instance>":	{
+            "action_space":	{
+                "Box(3,)":	{
+                    "bounded_above":	"[ True  True  True]",
+                    "bounded_below":	"[ True  True  True]",
+                    "dtype":	"float32",
+                    "high":	"[0.4 0.4 0.3]",
+                    "low":	"[-0.4 -0.4 -0.6]",
+                    "np_random":	"RandomState(MT19937)",
+                    "shape":	[
+                        3
+                    ]
+                }
+            },
+            "init_joint_positions":	[
+                0.006418,
+                0.413184,
+                -0.011401,
+                -1.589317,
+                0.005379,
+                1.137684,
+                -0.006539
+            ],
+            "is_good_view":	false,
+            "is_render":	false,
+            "joint_damping":	[
+                1e-05,
+                1e-05,
+                1e-05,
+                1e-05,
+                1e-05,
+                1e-05,
+                1e-05
+            ],
+            "joint_ranges":	[
+                5.8,
+                4,
+                5.8,
+                4,
+                5.8,
+                4,
+                6
+            ],
+            "lower_limits":	[
+                -0.967,
+                -2,
+                -2.96,
+                0.19,
+                -2.96,
+                -2.09,
+                -3.05
+            ],
+            "max_steps_one_episode":	1000,
+            "np_random":	"RandomState(MT19937)",
+            "observation_space":	{
+                "Box(3,)":	{
+                    "bounded_above":	"[ True  True  True]",
+                    "bounded_below":	"[ True  True  True]",
+                    "dtype":	"float32",
+                    "high":	"[1. 1. 1.]",
+                    "low":	"[-1.  -1.  -0.1]",
+                    "np_random":	"RandomState(MT19937)",
+                    "shape":	[
+                        3
+                    ]
+                }
+            },
+            "orientation":	[
+                0.7071067811865475,
+                -0.7071067811865476,
+                4.329780281177466e-17,
+                4.329780281177467e-17
+            ],
+            "rest_poses":	[
+                0,
+                0,
+                0,
+                1.5707963267948966,
+                0,
+                -1.0367255756846319,
+                0
+            ],
+            "step_counter":	0,
+            "upper_limits":	[
+                0.967,
+                2,
+                2.96,
+                2.29,
+                2.96,
+                2.09,
+                3.05
+            ],
+            "urdf_root_path":	"/home/dell/miniconda3/envs/spinningup/lib/python3.6/site-packages/pybullet_data",
+            "x_high_action":	0.4,
+            "x_high_obs":	1.0,
+            "x_high_obs_for_judge":	0.7,
+            "x_low_action":	-0.4,
+            "x_low_obs":	-1.0,
+            "x_low_obs_for_judge":	0.2,
+            "y_high_action":	0.4,
+            "y_high_obs":	1.0,
+            "y_high_obs_for_judge":	0.3,
+            "y_low_action":	-0.4,
+            "y_low_obs":	-1.0,
+            "y_low_obs_for_judge":	-0.3,
+            "z_high_action":	0.3,
+            "z_high_obs":	1.0,
+            "z_high_obs_for_judge":	0.55,
+            "z_low_action":	-0.6,
+            "z_low_obs":	-0.1,
+            "z_low_obs_for_judge":	0
+        }
+    },
+    "epochs":	100,
+    "exp_name":	"ppo-kuka-reach",
+    "gamma":	0.99,
+    "lam":	0.97,
+    "logger":	{
+        "<ppo.logx.EpochLogger object at 0x7f3220056cf8>":	{
+            "epoch_dict":	{},
+            "exp_name":	"ppo-kuka-reach",
+            "first_row":	true,
+            "is_debug":	true,
+            "log_current_row":	{},
+            "log_headers":	[],
+            "output_dir":	"../../logs/ppo-kuka-reach/ppo-kuka-reach_s0",
+            "output_file":	{
+                "<_io.TextIOWrapper name='../../logs/ppo-kuka-reach/ppo-kuka-reach_s0/progress.txt' mode='w' encoding='UTF-8'>":	{
+                    "mode":	"w"
+                }
+            }
+        }
+    },
+    "logger_kwargs":	{
+        "exp_name":	"ppo-kuka-reach",
+        "output_dir":	"../../logs/ppo-kuka-reach/ppo-kuka-reach_s0"
+    },
+    "max_ep_len":	1000,
+    "pi_lr":	0.0003,
+    "save_freq":	10,
+    "seed":	0,
+    "steps_per_epoch":	5000,
+    "target_kl":	0.01,
+    "train_pi_iters":	80,
+    "train_v_iters":	80,
+    "vf_lr":	0.001
+}
